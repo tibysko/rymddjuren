@@ -8,10 +8,15 @@ interface Props {
   onStation: () => void
 }
 
+// I dev-läge (npm run dev) är alla banor upplåsta så man kan testa direkt.
+// Den byggda spela.html är en produktionsbygge → normal upplåsning gäller där.
+const DEV = import.meta.env.DEV
+
 export default function StarMap({ progress, onPlay, onStation }: Props) {
   const stars = progress.stars || {}
 
   function isUnlocked(level: Level): boolean {
+    if (DEV) return true
     if (level.id === 1) return true
     return (stars[level.id - 1] || 0) > 0
   }
@@ -19,7 +24,7 @@ export default function StarMap({ progress, onPlay, onStation }: Props) {
   return (
     <div className="starmap">
       <header className="starmap-header">
-        <h1>🚀 Rymddjuren</h1>
+        <h1>🚀 Rymddjuren{DEV && <span className="dev-badge">🔧 DEV</span>}</h1>
         <button className="station-btn" onClick={onStation}>
           🛰️ Min rymdstation
         </button>
