@@ -32,11 +32,23 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
   const [fed, setFed] = useState<number[]>([]) // matade index i feed-frågor
   const [locked, setLocked] = useState(false)
   const [rabbitPos, setRabbitPos] = useState<number | null>(null) // position i hopp-frågor
+  const [landedWrong, setLandedWrong] = useState(false) // kaninen landade fel
   const hopTimer = useRef<ReturnType<typeof setInterval> | undefined>(undefined)
+  // Ravinhopp (Apornas planet): kaninens position i talenheter (x) och höjd i px (y)
+  const [jumpX, setJumpX] = useState<number | null>(null)
+  const [jumpY, setJumpY] = useState(0)
+  const [jumpFell, setJumpFell] = useState(false) // föll ner i ravinen
+  const jumpRaf = useRef<number | undefined>(undefined)
 
   const q = questions[index]
 
-  useEffect(() => () => clearInterval(hopTimer.current), [])
+  useEffect(
+    () => () => {
+      clearInterval(hopTimer.current)
+      if (jumpRaf.current !== undefined) cancelAnimationFrame(jumpRaf.current)
+    },
+    [],
+  )
 
   function nextQuestion(wasFirstTry: boolean) {
     if (wasFirstTry) setFirstTryCorrect((n) => n + 1)
@@ -47,6 +59,10 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
       setWrongChoice(null)
       setFed([])
       setRabbitPos(null)
+      setLandedWrong(false)
+      setJumpX(null)
+      setJumpY(0)
+      setJumpFell(false)
       setAttempted(false)
       setLocked(false)
       if (index + 1 >= questions.length) {
@@ -75,27 +91,107 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
     }
   }
 
-  // Hopp-frågor: kaninen hoppar sten för sten när svaret är rätt
+  // Hopp-frågor: kaninen hoppar ALLTID exakt så många hopp som barnet väljer.
+  // Rätt svar → landar på stjärnan. Fel svar → landar synligt fel på tallinjen,
+  // så barnet ser varför t.ex. 3 hopp inte räcker fram till stjärnan.
   function answerHop(choice: number) {
     if (locked) return
     if (q.type !== 'hop') return
-    if (choice !== q.answer) {
-      wrongAnswer(choice)
-      return
-    }
     setLocked(true)
+    setLandedWrong(false)
     const wasFirstTry = !attempted
     const dir = q.target > q.start ? 1 : -1
+    const landing = q.start + dir * choice
     let pos = q.start
     hopTimer.current = setInterval(() => {
       pos += dir
       setRabbitPos(pos)
-      if (pos === q.target) {
+      if (pos === landing) {
         clearInterval(hopTimer.current)
-        setLocked(false)
-        nextQuestion(wasFirstTry)
+        if (landing === q.target) {
+          setLocked(false)
+          nextQuestion(wasFirstTry)
+        } else {
+          // Landade fel – låt det synas en stund, hoppa sen tillbaka till start
+          setLandedWrong(true)
+          setWrongChoice(choice)
+          setAttempted(true)
+          const short = (dir === 1 ? landing < q.target : landing > q.target)
+          setFeedback({
+            text: short
+              ? `Oj! ${choice} hopp räckte inte fram. Prova igen!`
+              : `Oj! ${choice} hopp var för långt. Prova igen!`,
+            happy: false,
+          })
+          setTimeout(() => {
+            setFeedback(null)
+            setLandedWrong(false)
+            setRabbitPos(q.start)
+            setWrongChoice(null)
+            setLocked(false)
+          }, 2200)
+        }
       }
     }, 380)
+  }
+
+  // Ravinhopp: kaninen hoppar en parabelbåge exakt så långt barnet valt.
+  // Rätt hopp → landar vid bananen. För kort → faller ner i ravinen.
+  // För långt → hoppar förbi bananen. Talet = hoppets kraft (start + hopp).
+  const FLIGHT_MS = 750
+  const ARC_H = 80 // hoppbågens höjd i px
+  const DROP = 120 // fall ner i ravinen i px
+
+  function answerJump(choice: number) {
+    if (locked) return
+    if (q.type !== 'jump') return
+    setLocked(true)
+    setJumpFell(false)
+    setWrongChoice(null)
+    const start = q.start
+    const target = q.target
+    const landing = start + choice
+    const wasFirstTry = !attempted
+    let t0: number | null = null
+    const step = (t: number) => {
+      if (t0 === null) t0 = t
+      const p = Math.min(1, (t - t0) / FLIGHT_MS)
+      setJumpX(start + (landing - start) * p)
+      setJumpY(ARC_H * 4 * p * (1 - p)) // parabel: 0 → topp → 0
+      if (p < 1) {
+        jumpRaf.current = requestAnimationFrame(step)
+        return
+      }
+      jumpRaf.current = undefined
+      if (landing === target) {
+        setJumpX(landing)
+        setJumpY(0)
+        setLocked(false)
+        nextQuestion(wasFirstTry)
+        return
+      }
+      // Fel landning – låt det synas, hoppa sen tillbaka till start
+      setAttempted(true)
+      setWrongChoice(choice)
+      setJumpX(landing)
+      if (landing < target) {
+        setJumpFell(true)
+        setJumpY(-DROP)
+        setFeedback({ text: `Oj! ${choice} räckte inte fram – kaninen föll i ravinen! Prova igen.`, happy: false })
+      } else {
+        setJumpY(0)
+        setFeedback({ text: `Oj! ${choice} var för långt – kaninen hoppade förbi bananen! Prova igen.`, happy: false })
+      }
+      setTimeout(() => {
+        setFeedback(null)
+        setJumpFell(false)
+        setJumpX(start)
+        setJumpY(0)
+        setWrongChoice(null)
+        setLocked(false)
+      }, 2300)
+    }
+    jumpRaf.current = requestAnimationFrame(step)
   }
 
   function toggleFeed(i: number) {
@@ -172,10 +268,11 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
           <div className="stones">
             {q.stones.map((n) => {
               const pos = rabbitPos ?? q.start
+              const rabbitHere = pos === n
               return (
                 <div key={n} className="stone-col">
-                  <span className="stone-top">
-                    {pos === n ? '🐰' : n === q.target ? '⭐' : ''}
+                  <span className={`stone-top ${rabbitHere && landedWrong ? 'oops' : ''}`}>
+                    {rabbitHere ? '🐰' : n === q.target ? '⭐' : ''}
                   </span>
                   <span className={`stone ${n === q.target ? 'target' : ''}`}>{n}</span>
                 </div>
@@ -188,6 +285,49 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
                 key={c}
                 className={`choice-btn ${wrongChoice === c ? 'wrong' : ''}`}
                 onClick={() => answerHop(c)}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
+      {q.type === 'jump' && (
+        <>
+          <div className="jump-scene">
+            {Array.from({ length: q.hi - q.lo + 1 }).map((_, i) => {
+              const n = q.lo + i
+              const leftPct = ((n - q.lo + 0.5) / (q.hi - q.lo + 1)) * 100
+              const isRavine = n > q.start && n < q.target
+              return (
+                <div
+                  key={n}
+                  className={`jump-col ${isRavine ? 'ravine' : 'ground'} ${n === q.target ? 'goal' : ''}`}
+                  style={{ left: `${leftPct}%` }}
+                >
+                  {n === q.target && <span className="jump-banana">🍌🐵</span>}
+                  <span className="jump-platform" />
+                  <span className="jump-num">{n}</span>
+                </div>
+              )
+            })}
+            <span
+              className={`jump-rabbit ${jumpFell ? 'falling' : ''}`}
+              style={{
+                left: `${(((jumpX ?? q.start) - q.lo + 0.5) / (q.hi - q.lo + 1)) * 100}%`,
+                bottom: `calc(var(--jump-ground) + ${jumpY}px)`,
+              }}
+            >
+              🐰
+            </span>
+          </div>
+          <div className="choices">
+            {q.choices.map((c) => (
+              <button
+                key={c}
+                className={`choice-btn ${wrongChoice === c ? 'wrong' : ''}`}
+                onClick={() => answerJump(c)}
               >
                 {c}
               </button>

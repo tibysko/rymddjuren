@@ -1,6 +1,6 @@
 // Planeterna i Rymddjuren – mappade mot Lgr22 åk 1 (se DESIGN.md)
 
-import type { ChoiceQuestion, FeedQuestion, HopQuestion, Level, Question } from './types'
+import type { ChoiceQuestion, FeedQuestion, HopQuestion, JumpQuestion, Level, Question } from './types'
 
 function randInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min
@@ -75,10 +75,15 @@ function genLevel1(): Question[] {
 function genHopQuestion(): HopQuestion {
   const forward = Math.random() < 0.7
   const dist = randInt(1, 4)
-  const start = forward ? randInt(0, 20 - dist) : randInt(dist, 20)
+  // Svarsalternativen skapas först – kaninen hoppar bokstavligt det barnet
+  // väljer, så alla möjliga landningar måste rymmas på tallinjen 0–20.
+  const choices = makeChoices(dist, 1, 6)
+  const maxChoice = Math.max(...choices)
+  const start = forward ? randInt(0, 20 - maxChoice) : randInt(maxChoice, 20)
   const target = forward ? start + dist : start - dist
-  const lo = Math.max(0, Math.min(start, target) - 1)
-  const hi = Math.min(20, Math.max(start, target) + 1)
+  // Stenarna täcker start, alla möjliga landningar och en extra sten i kanten
+  const lo = Math.max(0, (forward ? start : start - maxChoice) - 1)
+  const hi = Math.min(20, (forward ? start + maxChoice : start) + 1)
   const stones: number[] = []
   for (let n = lo; n <= hi; n++) stones.push(n)
   return {
@@ -90,7 +95,7 @@ function genHopQuestion(): HopQuestion {
     stones,
     start,
     target,
-    choices: makeChoices(dist, 1, 6),
+    choices,
     answer: dist,
   }
 }
@@ -117,6 +122,41 @@ function genLevel2(): Question[] {
   return shuffle(questions)
 }
 
+// ---- Bana 3: Apornas planet – addition 0–10 (spår B: ravinhopp) ----
+//
+// Sidscrollande scen: apan står på ett tal, bananen hänger på ett tal längre
+// bort, och en ravin gapar emellan. Barnet väljer HUR LÅNGT hoppet är – talet
+// blir bokstavligen hoppets kraft (start + hopp = bananen). Väljer barnet för
+// kort hopp faller apan synligt ner i ravinen; för långt hopp = förbi bananen.
+// Addition = framåthopp, precis som Stjärnstigen fast med gravitation.
+
+function genJumpQuestion(): JumpQuestion {
+  const start = randInt(0, 4)
+  const answer = randInt(2, 5) // hoppets längd = det tal som fattas
+  const target = start + answer // bananens plats (≤ 9)
+  const hi = Math.min(10, target + 2)
+  const lo = Math.max(0, start - 1)
+  // Alla möjliga hopp måste rymmas på marken (annars kan apan hoppa ut ur scen)
+  const choices = makeChoices(answer, 1, hi - start)
+  return {
+    type: 'jump',
+    prompt: `Kaninen står på ${start}, bananen på ${target}. Hur långt hopp?`,
+    spoken: `Hjälp kaninen hoppa över ravinen till den hungriga apan! Kaninen står på talet ${start} och bananen hänger på talet ${target}. Hur långt är hoppet?`,
+    start,
+    target,
+    lo,
+    hi,
+    choices,
+    answer,
+  }
+}
+
+function genLevel3(): Question[] {
+  const questions: Question[] = []
+  for (let i = 0; i < QUESTIONS_PER_LEVEL; i++) questions.push(genJumpQuestion())
+  return questions
+}
+
 // ---- Planetlistan ----
 
 export const LEVELS: Level[] = [
@@ -138,7 +178,7 @@ export const LEVELS: Level[] = [
     desc: 'Talraden 0–20',
     generate: genLevel2,
   },
-  { id: 3, name: 'Apornas planet', animal: '🐵', animalName: 'Rymdapa', color: '#ff9f43', desc: 'Plus 0–10', generate: null },
+  { id: 3, name: 'Apornas planet', animal: '🐵', animalName: 'Rymdapa', color: '#ff9f43', desc: 'Plus 0–10', generate: genLevel3 },
   { id: 4, name: 'Kometkalaset', animal: '🦜', animalName: 'Stjärnpapegoja', color: '#54a0ff', desc: 'Minus 0–10', generate: null },
   { id: 5, name: 'Tvillingplaneten', animal: '🐼', animalName: 'Rymdpanda', color: '#5f27cd', desc: 'Dubbelt & hälften', generate: null },
   { id: 6, name: 'Kompisplaneten', animal: '🦊', animalName: 'Stjärnräv', color: '#ee5253', desc: 'Talkamrater', generate: null },

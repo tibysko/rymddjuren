@@ -35,7 +35,7 @@ och bedömningsstödet i taluppfattning för åk 1:
 - [x] Projektskelett (Vite + React)
 - [x] Stjärnkarta / nivåstruktur med belöningar (se DESIGN.md)
 - [x] Planet 1: Kaninplaneten – räkna antal + mata kaninen
-- [x] Planet 2: Stjärnstigen – talraden 0–20 (plattformsbana: kaninen hoppar på tallinjen)
+- [x] Planet 2: Stjärnstigen – talraden 0–20 (kaninen hoppar exakt så många hopp som barnet väljer – fel svar landar synligt fel på tallinjen, rätt svar landar på stjärnan)
 - [x] TypeScript-migrering
 - [ ] Planet 3–4: Plus & minus 0–10
 - [ ] Planet 5–7: Dubbelt/hälften, talkamrater, likhetstecknet

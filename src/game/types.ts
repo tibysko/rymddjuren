@@ -36,7 +36,25 @@ export interface HopQuestion {
   answer: number
 }
 
-export type Question = ChoiceQuestion | FeedQuestion | HopQuestion
+export interface JumpQuestion {
+  type: 'jump'
+  prompt: string
+  spoken: string
+  /** Apans startposition på marken (0–10) */
+  start: number
+  /** Bananens position – hit ska apan landa (0–10) */
+  target: number
+  /** Scenens vänstra kant (heltal som ritas ut) */
+  lo: number
+  /** Scenens högra kant */
+  hi: number
+  /** Hopplängder att välja bland (talet = hoppets kraft) */
+  choices: number[]
+  /** Rätt hopplängd = target - start */
+  answer: number
+}
+
+export type Question = ChoiceQuestion | FeedQuestion | HopQuestion | JumpQuestion
 
 export interface Level {
   id: number

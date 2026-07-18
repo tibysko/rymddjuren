@@ -287,6 +287,11 @@ h1 {
   transition: all 0.3s;
 }
 
+/* Kaninen landade på fel sten – skaka till så att felet syns */
+.stone-top.oops {
+  animation: shake 0.5s 2;
+}
+
 .stone {
   width: 2.9rem;
   height: 2.9rem;
@@ -309,6 +314,85 @@ h1 {
   border: 3px dashed var(--accent-red);
   color: var(--text);
   font-size: 1.5rem;
+}
+
+/* Apornas planet – ravinhopp (sidscrollande scen) */
+
+.jump-scene {
+  --jump-ground: 46px; /* markytans höjd från scenens botten */
+  position: relative;
+  width: min(640px, 92vw);
+  height: 210px;
+  margin: 0.5rem auto;
+  border-radius: 20px;
+  overflow: hidden;
+  background: linear-gradient(#2a1a3e 0%, #3d2456 55%, #1a1030 100%);
+}
+
+.jump-col {
+  position: absolute;
+  bottom: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  width: 2.4rem;
+}
+
+.jump-col .jump-platform {
+  display: block;
+  width: 2.4rem;
+  height: var(--jump-ground);
+  background: linear-gradient(#5a8f3c, #3c6127);
+  border-top: 4px solid #7bc24a;
+}
+
+/* Ravinen: ingen markyta – ett mörkt gap att falla i */
+.jump-col.ravine .jump-platform {
+  background: none;
+  border-top: none;
+  height: 8px;
+}
+
+.jump-col .jump-num {
+  position: absolute;
+  bottom: 6px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #f7f0d8;
+  text-shadow: 0 1px 2px #000a;
+  pointer-events: none;
+}
+
+.jump-col.ravine .jump-num {
+  opacity: 0.35;
+}
+
+.jump-col.goal .jump-platform {
+  background: linear-gradient(#c8912f, #8a5f1a);
+  border-top-color: var(--accent-yellow);
+}
+
+.jump-banana {
+  position: absolute;
+  bottom: calc(var(--jump-ground) + 2px);
+  font-size: 1.5rem;
+  white-space: nowrap;
+  animation: bounce 0.9s infinite alternate;
+}
+
+.jump-rabbit {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 2.1rem;
+  line-height: 1;
+  z-index: 2;
+  filter: drop-shadow(0 3px 3px #0007);
+}
+
+/* Fall ner i ravinen – mjuk nedåtrörelse */
+.jump-rabbit.falling {
+  transition: bottom 0.45s ease-in;
 }
 
 /* Mata djuret */
