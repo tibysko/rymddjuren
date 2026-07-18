@@ -33,7 +33,11 @@ export default function App() {
 
   function saveProgress(next: Progress) {
     setProgress(next)
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+    } catch {
+      // t.ex. privat läge – spelet funkar ändå, men sparar inte
+    }
   }
 
   function handlePlay(level: Level) {

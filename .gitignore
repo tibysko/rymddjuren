@@ -3,3 +3,4 @@ dist
 _to_delete
 .DS_Store
 *.local
+dist-single
