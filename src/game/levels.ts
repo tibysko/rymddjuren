@@ -1,6 +1,21 @@
 // Planeterna i Rymddjuren – mappade mot Lgr22 åk 1 (se DESIGN.md)
 
-import type { ChoiceQuestion, EatQuestion, FeedQuestion, HopQuestion, JumpQuestion, Level, Question, StairQuestion } from './types'
+import type {
+  BalanceQuestion,
+  ChoiceQuestion,
+  DoubleQuestion,
+  EatQuestion,
+  FeedQuestion,
+  HopQuestion,
+  JumpQuestion,
+  Level,
+  PairQuestion,
+  PatternQuestion,
+  Question,
+  ShareQuestion,
+  StairQuestion,
+  Via10Question,
+} from './types'
 
 function randInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min
@@ -240,6 +255,302 @@ function genLevel4(): Question[] {
   return shuffle(questions)
 }
 
+// ---- Bana 5: Tvillingplaneten – dubbelt & hälften (se docs/research-planet5-10.md) ----
+//
+// Barns delningsintuition är stark långt före formell matte – därför börjar
+// dubbelt/hälften i DELANDET: gungbrädan tippar mot den tyngre sidan så att
+// obalans syns och känns. Studsmattan gör dubbelt till en rörelse (hopp × 2),
+// och spegeldammen visar dubbelt som två lika delar.
+
+function genShareQuestion(): ShareQuestion {
+  const total = 2 * randInt(2, 5) // 4, 6, 8, 10 – alltid jämnt
+  return {
+    type: 'share',
+    prompt: `Dela ${total} lika mellan pandorna!`,
+    spoken: `Tvillingpandorna vill ha lika mycket bambu! Dela ${total} pinnar så att gungbrädan blir helt rak.`,
+    item: '🎋',
+    total,
+  }
+}
+
+function genDoubleQuestion(): DoubleQuestion {
+  const answer = randInt(2, 5)
+  const target = 2 * answer // 4, 6, 8, 10
+  return {
+    type: 'double',
+    prompt: `Till stjärnan på ${target}! Studsmattan dubblar. Vad hoppar du?`,
+    spoken: `Stjärnan är på talet ${target}. Studsmattan gör hoppet dubbelt så långt! Vilket tal ska kaninen hoppa?`,
+    target,
+    hi: 10,
+    choices: makeChoices(answer, 1, 5),
+    answer,
+  }
+}
+
+function genMirrorQuestion(): ChoiceQuestion {
+  const n = randInt(2, 5)
+  return {
+    type: 'choice',
+    prompt: 'Hur många blir det med spegeln?',
+    spoken: `Titta i spegeldammen! ${n} stjärnor – och deras spegelbilder. Hur många stjärnor ser du sammanlagt?`,
+    item: '⭐',
+    count: n,
+    mirror: true,
+    choices: makeChoices(2 * n, 2, 10),
+    answer: 2 * n,
+  }
+}
+
+function genLevel5(): Question[] {
+  const questions: Question[] = []
+  for (let i = 0; i < 4; i++) questions.push(genShareQuestion())
+  for (let i = 0; i < 4; i++) questions.push(genDoubleQuestion())
+  for (let i = 0; i < 2; i++) questions.push(genMirrorQuestion())
+  return shuffle(questions)
+}
+
+// ---- Bana 6: Kompisplaneten – talkamrater ----
+//
+// Del–helhet: räven önskar sig ett tal, och att PARA IHOP två högar som
+// tillsammans blir talet ÄR talkamratsmekaniken (à la Motion Math: Hungry
+// Fish). Tiokompisbron är en tioram byggd som bro – hur många plankor fattas?
+
+function genPairQuestion(): PairQuestion {
+  const want = randInt(5, 10)
+  const a = randInt(1, want - 1)
+  const b = want - a
+  // Två högar som passar + två som (oftast) inte gör det. Räven godkänner
+  // VARJE par som summerar rätt, så dubbletter är aldrig fel.
+  const piles = shuffle([a, b, randInt(1, 9), randInt(1, 9)])
+  return {
+    type: 'pair',
+    prompt: `Räven vill ha ${want}! Välj två högar.`,
+    spoken: `Stjärnräven är hungrig och vill ha exakt ${want} druvor. Välj två högar som tillsammans blir ${want}!`,
+    item: '🍇',
+    want,
+    piles,
+  }
+}
+
+function genBridgeQuestion(): ChoiceQuestion {
+  const filled = randInt(1, 9)
+  const answer = 10 - filled
+  return {
+    type: 'choice',
+    prompt: 'Hur många plankor fattas?',
+    spoken: `Bron över rymdbäcken har plats för tio plankor, men bara ${filled} är på plats. Hur många plankor fattas?`,
+    tenframe: filled,
+    choices: makeChoices(answer, 1, 9),
+    answer,
+  }
+}
+
+function genLevel6(): Question[] {
+  const questions: Question[] = []
+  for (let i = 0; i < 5; i++) questions.push(genPairQuestion())
+  for (let i = 0; i < 5; i++) questions.push(genBridgeQuestion())
+  return shuffle(questions)
+}
+
+// ---- Bana 7: Vågplaneten – likhetstecknet ----
+//
+// Viktigast av allt: likhetstecknet betyder "lika mycket på båda sidor",
+// inte "här kommer svaret". Därför roteras formaten medvetet – ibland är
+// helheten till vänster (7 = 3 + _), ibland uppdelningen (3 + 4 = _ + 2).
+// Vågen tippar synligt mot den tyngre sidan – fel svar SYNS som obalans.
+
+function genBalanceTwoPlusOne(): BalanceQuestion {
+  // vänster: a + b   höger: c + facket   (a + b = c + _)
+  const a = randInt(1, 5)
+  const b = randInt(1, 5)
+  const c = randInt(Math.max(1, a + b - 6), a + b - 1)
+  const answer = a + b - c
+  return {
+    type: 'balance',
+    prompt: 'Gör lika!',
+    spoken: `Vågen ska bli helt rak – lika mycket på båda sidor! Vänster sida har ${a} och ${b}. Höger sida har ${c} och ett tomt fack. Vilken sten gör det lika?`,
+    left: [a, b],
+    right: [c],
+    choices: makeChoices(answer, 1, 6),
+    answer,
+  }
+}
+
+function genBalanceWholeFirst(): BalanceQuestion {
+  // vänster: hela talet   höger: a + facket   (7 = 3 + _)
+  const t = randInt(4, 9)
+  const a = randInt(1, t - 1)
+  const answer = t - a
+  return {
+    type: 'balance',
+    prompt: 'Gör lika!',
+    spoken: `Lika mycket på båda sidor! Vänster sida har ${t}. Höger sida har ${a} och ett tomt fack. Vilken sten gör det lika?`,
+    left: [t],
+    right: [a],
+    choices: makeChoices(answer, 1, 8),
+    answer,
+  }
+}
+
+function genLevel7(): Question[] {
+  const questions: Question[] = []
+  for (let i = 0; i < 5; i++) questions.push(genBalanceTwoPlusOne())
+  for (let i = 0; i < 5; i++) questions.push(genBalanceWholeFirst())
+  return shuffle(questions)
+}
+
+// ---- Bana 8: Mönsterbältet – mönster och talföljder ----
+//
+// Progression enligt forskningen: fortsätt mönstret → översätt det (varje
+// färg är en TON, så mönstret hörs som melodi) → hitta biten som upprepas
+// (svårast, därför bara två sådana per bana). Talföljder = växande mönster.
+
+const PATTERN_COLORS = ['🔴', '🟡', '🔵', '🟢']
+
+function genPatternNextQuestion(): PatternQuestion {
+  const colors = shuffle(PATTERN_COLORS)
+  const unitLen = Math.random() < 0.7 ? 2 : 3
+  const unit = colors.slice(0, unitLen)
+  // t.ex. AB → 🔴🟡🔴🟡🔴❓  (svar 🟡), ABC → 🔴🟡🔵🔴🟡🔵🔴❓ (svar 🟡)
+  const sequence = [...unit, ...unit, unit[0]]
+  const answer = unit[1]
+  const wrong = colors[unitLen] // en färg som inte finns i mönstret
+  const choices = shuffle([...new Set([answer, unit[0], wrong])])
+  return {
+    type: 'pattern',
+    mode: 'next',
+    prompt: 'Vad kommer sen?',
+    spoken: 'Titta på mönstret – och lyssna! Vilken asteroid kommer sen?',
+    sequence,
+    choices,
+    answer,
+  }
+}
+
+function genPatternUnitQuestion(): PatternQuestion {
+  const colors = shuffle(PATTERN_COLORS)
+  const [x, y] = colors.slice(0, 2)
+  const sequence = [x, y, x, y, x, y]
+  const answer = x + y
+  const choices = shuffle([answer, x + x, y + y])
+  return {
+    type: 'pattern',
+    mode: 'unit',
+    prompt: 'Vilken bit upprepas?',
+    spoken: 'Mönstret är byggt av en liten bit som upprepas om och om igen. Vilken bit är det?',
+    sequence,
+    choices,
+    answer,
+  }
+}
+
+function genGrowingQuestion(): ChoiceQuestion {
+  const step = randInt(1, 2)
+  const up = Math.random() < 0.7
+  const len = 4
+  const startLo = up ? 0 : step * (len - 1)
+  const startHi = up ? 20 - step * (len - 1) : 20
+  const s = randInt(startLo, startHi)
+  const seq = Array.from({ length: len }, (_, i) => (up ? s + i * step : s - i * step))
+  const answer = seq[len - 1]
+  return {
+    type: 'choice',
+    prompt: 'Vilket tal kommer sen?',
+    spoken: `Talen hoppar i ett mönster: ${seq.slice(0, len - 1).join(', ')}... Vilket tal kommer sen?`,
+    numberline: [...seq.slice(0, len - 1), null],
+    choices: makeChoices(answer, 0, 20),
+    answer,
+  }
+}
+
+function genLevel8(): Question[] {
+  const questions: Question[] = []
+  for (let i = 0; i < 5; i++) questions.push(genPatternNextQuestion())
+  for (let i = 0; i < 3; i++) questions.push(genGrowingQuestion())
+  for (let i = 0; i < 2; i++) questions.push(genPatternUnitQuestion())
+  return shuffle(questions)
+}
+
+// ---- Bana 9: Jätteplaneten – addition & subtraktion 0–20 ----
+//
+// Nyckeln till 0–20 är att BRYGGA ÖVER TIAN: 8 + 5 = 8 + 2 + 3, med
+// tiokompisarna (planet 6!) som verktyg. Talet 10 är en lysande vilostation
+// och stora hopp görs i två steg. Resten är hopp på den långa talraden.
+
+function genVia10Question(): Via10Question {
+  const add = Math.random() < 0.6
+  const start = add ? randInt(6, 9) : randInt(12, 15)
+  const target = add ? randInt(12, 15) : randInt(5, 9)
+  const answer1 = Math.abs(10 - start)
+  const answer2 = Math.abs(target - 10)
+  const choices1 = makeChoices(answer1, 1, 5)
+  const choices2 = makeChoices(answer2, 1, 5)
+  // Rita linjen så att ALLA valbara landningar ryms (kaninen hoppar det barnet väljer)
+  const max1 = Math.max(...choices1)
+  const max2 = Math.max(...choices2)
+  const lo = add
+    ? start - 1
+    : Math.max(0, Math.min(start - max1, 10 - max2, target) - 1)
+  const hi = add
+    ? Math.min(20, Math.max(start + max1, 10 + max2, target) + 1)
+    : start + 1
+  return {
+    type: 'via10',
+    prompt: add
+      ? `Från ${start} till ${target} – hoppa till tian först!`
+      : `Från ${start} ner till ${target} – vila på tian!`,
+    spoken: add
+      ? `Ett jättehopp från ${start} till ${target}! Det är långt – hoppa till vilostationen på tian först. Hur långt är första hoppet?`
+      : `Ett jättehopp från ${start} ner till ${target}! Hoppa ner till vilostationen på tian först. Hur långt är första hoppet?`,
+    start,
+    target,
+    lo,
+    hi,
+    choices1,
+    answer1,
+    choices2,
+    answer2,
+  }
+}
+
+function genLevel9(): Question[] {
+  const questions: Question[] = []
+  for (let i = 0; i < 6; i++) questions.push(genVia10Question())
+  for (let i = 0; i < 4; i++) questions.push(genHopQuestion())
+  return shuffle(questions)
+}
+
+// ---- Bana 10: Festplaneten – den stora blandade utmaningen ----
+//
+// Blandad övning (interleaving) ger bäst långtidsinlärning: barnet måste
+// VÄLJA strategi, inte upprepa den senaste. Festen blandar frågor från alla
+// planeter – adaptivt viktade så att planeter med färre stjärnor kommer
+// oftare. Datan finns redan i localStorage.
+
+function genLevel10(): Question[] {
+  let stars: Record<number, number> = {}
+  try {
+    // samma nyckel som App.tsx (STORAGE_KEY)
+    const raw = localStorage.getItem('rymddjuren-progress')
+    if (raw) stars = (JSON.parse(raw) as { stars?: Record<number, number> }).stars ?? {}
+  } catch {
+    // ingen sparad data – blanda jämnt
+  }
+  const pool: number[] = []
+  for (const lvl of LEVELS) {
+    if (lvl.id === 10 || !lvl.generate) continue
+    const weight = Math.max(1, 4 - (stars[lvl.id] ?? 0)) // färre stjärnor → fler frågor
+    for (let i = 0; i < weight; i++) pool.push(lvl.id)
+  }
+  const questions: Question[] = []
+  for (let i = 0; i < QUESTIONS_PER_LEVEL; i++) {
+    const id = pool[randInt(0, pool.length - 1)]
+    const bank = LEVELS.find((l) => l.id === id)!.generate!()
+    questions.push(bank[randInt(0, bank.length - 1)])
+  }
+  return questions
+}
+
 // ---- Planetlistan ----
 
 export const LEVELS: Level[] = [
@@ -263,12 +574,12 @@ export const LEVELS: Level[] = [
   },
   { id: 3, name: 'Apornas planet', animal: '🐵', animalName: 'Rymdapa', color: '#ff9f43', desc: 'Plus 0–10', generate: genLevel3 },
   { id: 4, name: 'Kometkalaset', animal: '🦜', animalName: 'Stjärnpapegoja', color: '#54a0ff', desc: 'Minus 0–10', generate: genLevel4 },
-  { id: 5, name: 'Tvillingplaneten', animal: '🐼', animalName: 'Rymdpanda', color: '#5f27cd', desc: 'Dubbelt & hälften', generate: null },
-  { id: 6, name: 'Kompisplaneten', animal: '🦊', animalName: 'Stjärnräv', color: '#ee5253', desc: 'Talkamrater', generate: null },
-  { id: 7, name: 'Vågplaneten', animal: '🦎', animalName: 'Rymdödla', color: '#10ac84', desc: 'Lika mycket =', generate: null },
-  { id: 8, name: 'Mönsterbältet', animal: '🐴', animalName: 'Stjärnhäst', color: '#f368e0', desc: 'Mönster', generate: null },
-  { id: 9, name: 'Jätteplaneten', animal: '🦁', animalName: 'Rymdlejon', color: '#ff6348', desc: 'Plus & minus 0–20', generate: null },
-  { id: 10, name: 'Festplaneten', animal: '🐘', animalName: 'Månelefant', color: '#ffd32a', desc: 'Stora utmaningen', generate: null },
+  { id: 5, name: 'Tvillingplaneten', animal: '🐼', animalName: 'Rymdpanda', color: '#5f27cd', desc: 'Dubbelt & hälften', generate: genLevel5 },
+  { id: 6, name: 'Kompisplaneten', animal: '🦊', animalName: 'Stjärnräv', color: '#ee5253', desc: 'Talkamrater', generate: genLevel6 },
+  { id: 7, name: 'Vågplaneten', animal: '🦎', animalName: 'Rymdödla', color: '#10ac84', desc: 'Lika mycket =', generate: genLevel7 },
+  { id: 8, name: 'Mönsterbältet', animal: '🐴', animalName: 'Stjärnhäst', color: '#f368e0', desc: 'Mönster', generate: genLevel8 },
+  { id: 9, name: 'Jätteplaneten', animal: '🦁', animalName: 'Rymdlejon', color: '#ff6348', desc: 'Plus & minus 0–20', generate: genLevel9 },
+  { id: 10, name: 'Festplaneten', animal: '🐘', animalName: 'Månelefant', color: '#ffd32a', desc: 'Stora utmaningen', generate: genLevel10 },
 ]
 
 export const QUESTIONS_PER_LEVEL = 10

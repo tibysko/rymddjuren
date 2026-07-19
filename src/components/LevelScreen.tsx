@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react'
 import { QUESTIONS_PER_LEVEL, starsFor } from '../game/levels'
 import { speak } from '../game/speech'
 import type { Level } from '../game/types'
+import { BalanceScene, DoubleScene, PairScene, PatternScene, ShareScene, Via10Scene } from './scenes'
 
 const CHEERS = ['Bra jobbat!', 'Superbra!', 'Wow, vad duktig du är!', 'Rätt! 🎉', 'Hurra!']
 const TRY_AGAIN = ['Nästan! Prova igen!', 'Inte riktigt – du klarar det!', 'Försök en gång till!']
@@ -275,6 +276,18 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
     }, 550)
   }
 
+  // Scenerna för planet 5–10 (scenes.tsx) äger sina egna animationer och
+  // ropar hit när barnet svarat – LevelScreen sköter jubel och andra chansen.
+  function sceneRight() {
+    nextQuestion(!attempted)
+  }
+
+  function sceneWrong(msg: string) {
+    setAttempted(true)
+    setFeedback({ text: msg, happy: false })
+    setTimeout(() => setFeedback(null), 2200)
+  }
+
   // Kalasbordet: fel svar → de uppätna godisarna visas som bleka spöken,
   // så barnet kan räkna både de som är kvar och de som är borta.
   function answerEat(choice: number) {
@@ -310,9 +323,16 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
       <header className="level-header">
         <button className="quit-btn" onClick={onQuit}>⬅️</button>
         <div className="progress-dots">
-          {questions.map((_, i) => (
-            <span key={i} className={`dot ${i < index ? 'done' : i === index ? 'now' : ''}`} />
-          ))}
+          {questions.map((_, i) =>
+            level.id === 10 ? (
+              // Festplaneten: varje rätt svar tänder en festlykta!
+              <span key={i} className={`lantern ${i < index ? 'lit' : ''} ${i === index ? 'now' : ''}`}>
+                🏮
+              </span>
+            ) : (
+              <span key={i} className={`dot ${i < index ? 'done' : i === index ? 'now' : ''}`} />
+            ),
+          )}
         </div>
         <span className="level-count">{index + 1}/{QUESTIONS_PER_LEVEL}</span>
       </header>
@@ -327,9 +347,25 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
       {q.type === 'choice' && (
         <>
           {q.item && (
-            <div className="count-items">
+            <div className={`count-items ${q.mirror ? 'mirrored' : ''}`}>
               {Array.from({ length: q.count ?? 0 }).map((_, i) => (
                 <span key={i} className="count-item">{q.item}</span>
+              ))}
+              {q.mirror && (
+                <div className="mirror-row">
+                  {Array.from({ length: q.count ?? 0 }).map((_, i) => (
+                    <span key={i} className="count-item mirror-item">{q.item}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          {q.tenframe !== undefined && (
+            <div className="tenframe" data-filled={q.tenframe}>
+              {Array.from({ length: 10 }).map((_, i) => (
+                <span key={i} className={`tf-cell ${i < q.tenframe! ? 'filled' : ''}`}>
+                  {i < q.tenframe! ? '🪵' : ''}
+                </span>
               ))}
             </div>
           )}
@@ -527,6 +563,25 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
             Klart! ✅
           </button>
         </>
+      )}
+
+      {q.type === 'share' && (
+        <ShareScene key={index} q={q} locked={locked} onRight={sceneRight} onWrong={sceneWrong} />
+      )}
+      {q.type === 'double' && (
+        <DoubleScene key={index} q={q} locked={locked} onRight={sceneRight} onWrong={sceneWrong} />
+      )}
+      {q.type === 'pair' && (
+        <PairScene key={index} q={q} locked={locked} onRight={sceneRight} onWrong={sceneWrong} />
+      )}
+      {q.type === 'balance' && (
+        <BalanceScene key={index} q={q} locked={locked} onRight={sceneRight} onWrong={sceneWrong} />
+      )}
+      {q.type === 'pattern' && (
+        <PatternScene key={index} q={q} locked={locked} onRight={sceneRight} onWrong={sceneWrong} />
+      )}
+      {q.type === 'via10' && (
+        <Via10Scene key={index} q={q} locked={locked} onRight={sceneRight} onWrong={sceneWrong} />
       )}
 
       {feedback && (

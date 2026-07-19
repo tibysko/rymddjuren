@@ -51,6 +51,10 @@ och bedömningsstödet i taluppfattning för åk 1:
 - [x] TypeScript-migrering
 - [x] Planet 3: Apornas planet – ravinhopp där valt tal = hoppets kraft (plus 0–10, "spår B", se docs/research-plattformsspel.md)
 - [x] Planet 4: Kometkalaset – minus 0–10 på tre sätt: komettrappan ner (ta bort som bakåtrörelse, trappan slutar vid 0), kalasbordet (papegojan äter synligt upp godisar – "hur många är kvar?") och trappan upp (räkna uppåt/utfyllnad, se docs/research-planet4-kometkalaset.md)
-- [ ] Planet 5–7: Dubbelt/hälften, talkamrater, likhetstecknet
-- [ ] Planet 8–10: Mönster, tal 0–20, blandad utmaning
+- [x] Planet 5: Tvillingplaneten – gungbrädan tippar mot den tyngre sidan när man delar lika, studsmattan dubblar hoppet, spegeldammen visar dubbelt (se docs/research-planet5-10.md)
+- [x] Planet 6: Kompisplaneten – para ihop två högar till rävens tal (talkamrater) + tiokompisbron (tioram som bro)
+- [x] Planet 7: Vågplaneten – balansvågen ÄR banan, formaten roteras (3 + _ = 7 och 7 = 3 + _) så att likhetstecknet betyder "lika mycket", inte "här kommer svaret"
+- [x] Planet 8: Mönsterbältet – hästen galopperar i mönstret (varje färg är en ton – mönstret hörs!), talföljder och "vilken bit upprepas?"
+- [x] Planet 9: Jätteplaneten – jättehopp i två steg via vilostationen på tian (bridging through ten) på talraden 0–20
+- [x] Planet 10: Festplaneten – blandad utmaning med frågor från alla planeter, adaptivt viktade mot de planeter som fått färst stjärnor; festlyktor tänds för varje rätt svar
 - [ ] Fler djur/animationer i rymdstationen

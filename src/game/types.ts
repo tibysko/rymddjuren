@@ -9,6 +9,10 @@ export interface ChoiceQuestion {
   count?: number
   /** Tallinje där null = det tal som fattas */
   numberline?: (number | null)[]
+  /** Spegeldammen (planet 5): visa raden en gång till som spegelbild */
+  mirror?: boolean
+  /** Tiokompisbron (planet 6): så många av broens 10 plankor är på plats */
+  tenframe?: number
   choices: number[]
   answer: number
 }
@@ -89,7 +93,101 @@ export interface EatQuestion {
   answer: number
 }
 
-export type Question = ChoiceQuestion | FeedQuestion | HopQuestion | JumpQuestion | StairQuestion | EatQuestion
+/** Tvillingplaneten: dela lika mellan pandorna – gungbrädan tippar synligt */
+export interface ShareQuestion {
+  type: 'share'
+  prompt: string
+  spoken: string
+  item: string
+  /** Så många ska delas – alltid jämnt */
+  total: number
+}
+
+/** Tvillingplaneten: studsmattan dubblar hoppet – valt tal × 2 = landning */
+export interface DoubleQuestion {
+  type: 'double'
+  prompt: string
+  spoken: string
+  /** Stjärnans plats – alltid jämn (= dubbelt av svaret) */
+  target: number
+  /** Banans högsta tal som ritas */
+  hi: number
+  choices: number[]
+  /** Rätt hoppkraft = target / 2 */
+  answer: number
+}
+
+/** Kompisplaneten: välj TVÅ högar som tillsammans blir rävens tal */
+export interface PairQuestion {
+  type: 'pair'
+  prompt: string
+  spoken: string
+  item: string
+  /** Talet räven önskar sig */
+  want: number
+  /** Högarnas storlekar – minst ett par summerar till want */
+  piles: number[]
+}
+
+/** Vågplaneten: gör lika på båda sidor – vågen tippar mot den tyngre */
+export interface BalanceQuestion {
+  type: 'balance'
+  prompt: string
+  spoken: string
+  /** Kända korgar på vänster sida */
+  left: number[]
+  /** Kända korgar på höger sida (plus det tomma facket) */
+  right: number[]
+  choices: number[]
+  /** Rätt sten = summa vänster − summa höger */
+  answer: number
+}
+
+/** Mönsterbältet: fortsätt mönstret / hitta biten som upprepas */
+export interface PatternQuestion {
+  type: 'pattern'
+  prompt: string
+  spoken: string
+  /** 'next' = vad kommer sen?  'unit' = vilken bit upprepas? */
+  mode: 'next' | 'unit'
+  /** Mönstret som visas (utan det som fattas) */
+  sequence: string[]
+  /** Emoji (next) eller emoji-bitar (unit) att välja bland */
+  choices: string[]
+  answer: string
+}
+
+/** Jätteplaneten: stora hopp i TVÅ steg – via vilostationen på 10 */
+export interface Via10Question {
+  type: 'via10'
+  prompt: string
+  spoken: string
+  start: number
+  target: number
+  /** Lägsta/högsta tal som ritas (10 ingår alltid) */
+  lo: number
+  hi: number
+  /** Steg 1: hoppet till tian */
+  choices1: number[]
+  answer1: number
+  /** Steg 2: resten till stjärnan */
+  choices2: number[]
+  answer2: number
+}
+
+export type Question =
+  | ChoiceQuestion
+  | FeedQuestion
+  | HopQuestion
+  | JumpQuestion
+  | StairQuestion
+  | EatQuestion
+  | ShareQuestion
+  | DoubleQuestion
+  | PairQuestion
+  | BalanceQuestion
+  | PatternQuestion
+  | Via10Question
 
 export interface Level {
   id: number
