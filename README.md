@@ -64,9 +64,12 @@ och bedömningsstödet i taluppfattning för åk 1:
 
 Två saker ritas med PixiJS v8 (`src/game/pixi.ts` väljer renderare):
 
-- **Effektlagret** (`SpaceBackdrop.tsx`): stjärnfält bakom hela spelet och
-  guld-/rödstjärneregn när en planet är avklarad. Ren dekoration –
-  `pointer-events: none`, respekterar `prefers-reduced-motion`.
+- **Effektlagret** (`SpaceBackdrop.tsx`): stjärnfält som blinkar bakom hela
+  spelet, med stjärnfall och kometer på stjärnkartan, hyperrymdsstrimmor
+  under raketresan till en planet, stjärnexplosion vid varje rätt svar
+  (`cheerBurst()` i `src/game/fx.ts`) och guld-/rödstjärneregn när en planet
+  är avklarad. Ren dekoration – `pointer-events: none`, respekterar
+  `prefers-reduced-motion`.
 - **Apornas planet** (`JumpScene.tsx`): ravinhoppet som canvas-bana med mjuk
   kamera och parallax. Knappar, Ugglis och 🔊 bor kvar i DOM.
 

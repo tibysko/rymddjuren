@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
+import { cheerBurst } from '../game/fx'
 import { QUESTIONS_PER_LEVEL, starsFor } from '../game/levels'
 import { speak } from '../game/speech'
 import type { Level } from '../game/types'
@@ -79,6 +80,7 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
 
   function nextQuestion(wasFirstTry: boolean) {
     if (wasFirstTry) setFirstTryCorrect((n) => n + 1)
+    cheerBurst() // stjärnexplosion i rymden bakom – varje rätt svar firas!
     setFeedback({ text: pick(CHEERS), happy: true })
     setLocked(true)
     setTimeout(() => {

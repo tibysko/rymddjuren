@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import SpaceBackdrop from './components/SpaceBackdrop'
 import StarMap from './components/StarMap'
 import LevelScreen from './components/LevelScreen'
@@ -8,7 +8,7 @@ import type { Level, Progress } from './game/types'
 
 const STORAGE_KEY = 'rymddjuren-progress'
 
-type Screen = 'map' | 'level' | 'result' | 'station'
+type Screen = 'map' | 'travel' | 'level' | 'result' | 'station'
 
 interface LastResult {
   stars: number
@@ -43,8 +43,15 @@ export default function App() {
 
   function handlePlay(level: Level) {
     setCurrentLevel(level)
-    setScreen('level')
+    setScreen('travel') // först en snabb raketresa genom hyperrymden!
   }
+
+  // Resan är kort och kräver ingenting av spelaren – banan startar av sig själv
+  useEffect(() => {
+    if (screen !== 'travel') return
+    const id = setTimeout(() => setScreen('level'), 1700)
+    return () => clearTimeout(id)
+  }, [screen])
 
   function handleLevelDone(stars: number, correct: number) {
     if (!currentLevel) return
@@ -61,11 +68,19 @@ export default function App() {
 
   return (
     <>
-      {/* Stjärnfältet bakom allt – guldregn när en planet är avklarad! */}
-      <SpaceBackdrop mode={screen === 'result' ? 'cheer' : 'calm'} />
+      {/* Stjärnfältet bakom allt – hyperrymd på väg till planeten, guldregn när den är klarad! */}
+      <SpaceBackdrop mode={screen === 'result' ? 'cheer' : screen === 'travel' ? 'travel' : 'calm'} />
       <div className="app">
       {screen === 'map' && (
         <StarMap progress={progress} onPlay={handlePlay} onStation={() => setScreen('station')} />
+      )}
+      {screen === 'travel' && currentLevel && (
+        <div className="travel">
+          <span className="travel-rocket">🚀</span>
+          <p className="travel-text">
+            Mot {currentLevel.name}! <span className="travel-animal">{currentLevel.animal}</span>
+          </p>
+        </div>
       )}
       {screen === 'level' && currentLevel && (
         <LevelScreen level={currentLevel} onDone={handleLevelDone} onQuit={() => setScreen('map')} />

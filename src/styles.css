@@ -1161,3 +1161,39 @@ body.gpu-stars {
 .jump-canvas canvas {
   display: block;
 }
+
+/* Raketresan: kort mellanskärm medan stjärnorna strimmar förbi */
+.travel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  min-height: 70vh;
+  text-align: center;
+}
+
+.travel-rocket {
+  font-size: 5.5rem;
+  /* Raketen pekar uppåt och skakar av farten */
+  transform: rotate(-45deg);
+  animation: rumble 0.18s infinite;
+  filter: drop-shadow(0 14px 18px rgba(255, 120, 40, 0.45));
+}
+
+@keyframes rumble {
+  0%, 100% { transform: rotate(-45deg) translate(0, 0); }
+  25% { transform: rotate(-44deg) translate(1.5px, -1px); }
+  50% { transform: rotate(-46deg) translate(-1px, 1.5px); }
+  75% { transform: rotate(-45deg) translate(1px, 1px); }
+}
+
+.travel-text {
+  font-size: 1.7rem;
+  font-weight: 800;
+}
+
+.travel-animal {
+  font-size: 2.2rem;
+  margin-left: 0.3rem;
+}

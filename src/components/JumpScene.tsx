@@ -143,6 +143,54 @@ function JumpScenePixi({ q, locked, onRight, onWrong, onFail }: Props & { onFail
       rabbit.y = groundY + 2
       world.addChild(rabbit)
 
+      // Partiklar: gnistspår i luften, dammpuff vid landning, stjärnor vid rätt
+      interface P {
+        g: Graphics
+        vx: number
+        vy: number
+        life: number
+        maxLife: number
+        grav: number
+      }
+      const parts: P[] = []
+      const partLayer = new Container()
+      world.addChild(partLayer)
+
+      function addP(g: Graphics, vx: number, vy: number, life: number, grav: number) {
+        partLayer.addChild(g)
+        parts.push({ g, vx, vy, life, maxLife: life, grav })
+      }
+
+      function sparkle(x: number, y: number) {
+        const g = new Graphics().circle(0, 0, 1.8 + Math.random() * 1.6).fill(0xffd32a)
+        g.x = x + (Math.random() - 0.5) * 8
+        g.y = y - 20 + (Math.random() - 0.5) * 8
+        addP(g, (Math.random() - 0.5) * 30, 20 + Math.random() * 30, 0.45, 60)
+      }
+
+      function puff(x: number, y: number, color: number) {
+        for (let i = 0; i < 9; i++) {
+          const g = new Graphics().circle(0, 0, 2.5 + Math.random() * 3).fill({ color, alpha: 0.8 })
+          g.x = x + (Math.random() - 0.5) * 14
+          g.y = y - 2
+          const ang = Math.PI + (i / 9) * Math.PI // uppåt/utåt
+          addP(g, Math.cos(ang) * (30 + Math.random() * 50), -Math.abs(Math.sin(ang)) * (20 + Math.random() * 40), 0.55, 140)
+        }
+      }
+
+      function starBurst(x: number, y: number) {
+        for (let i = 0; i < 14; i++) {
+          const size = 3.5 + Math.random() * 4
+          const color = i % 3 === 0 ? 0xff4d4d : 0xffd32a
+          const g = new Graphics().star(0, 0, 5, size, size * 0.45).fill(color)
+          g.x = x
+          g.y = y - 24
+          const ang = (i / 14) * Math.PI * 2
+          const sp = 90 + Math.random() * 130
+          addP(g, Math.cos(ang) * sp, Math.sin(ang) * sp - 60, 0.9, 260)
+        }
+      }
+
       // Tillstånd för animationen (utanför React – tickern äger det här)
       let phase: Phase = 'idle'
       let t = 0
@@ -198,15 +246,19 @@ function JumpScenePixi({ q, locked, onRight, onWrong, onFail }: Props & { onFail
           rabbit.x = fromX + (toX - fromX) * p
           rabbit.y = groundY + 2 - ARC * 4 * p * (1 - p)
           rabbit.rotation = 0.2 * Math.sin(Math.PI * p) * (toX > fromX ? 1 : -1)
+          if (Math.random() < 0.7) sparkle(rabbit.x, rabbit.y) // gnistspår i luften
           if (p >= 1) {
             rabbit.rotation = 0
             if (landing === q.target) {
               phase = 'celebrate'
+              puff(rabbit.x, groundY, 0x7bc24a)
+              starBurst(rabbit.x, groundY) // stjärnor yr hos apan!
               playTone(523, 300)
               cbRef.current.onRight()
             } else if (landing < q.target) {
               phase = 'fall'
               t = 0
+              puff(rabbit.x, groundY + 30, 0x4a3a66) // mörkt damm ur ravinen
               cbRef.current.onWrong(`Oj! ${choice} räckte inte fram – kaninen föll i ravinen! Prova igen.`)
               setWrongChoice(choice)
               playTone(147, 350)
@@ -214,6 +266,7 @@ function JumpScenePixi({ q, locked, onRight, onWrong, onFail }: Props & { onFail
             } else {
               phase = 'past'
               t = 0
+              puff(rabbit.x, groundY, 0x9b8ac2) // dammpuff – hård landning!
               cbRef.current.onWrong(`Oj! ${choice} var för långt – kaninen hoppade förbi bananen! Prova igen.`)
               setWrongChoice(choice)
               playTone(147, 350)
@@ -230,6 +283,20 @@ function JumpScenePixi({ q, locked, onRight, onWrong, onFail }: Props & { onFail
           // Landade förbi – kaninen vinglar till
           t += dt
           rabbit.rotation = 0.25 * Math.sin(t * 14) * Math.max(0, 1 - t)
+        }
+
+        // Uppdatera partiklarna
+        for (let i = parts.length - 1; i >= 0; i--) {
+          const pt = parts[i]
+          pt.life -= dt
+          pt.vy += pt.grav * dt
+          pt.g.x += pt.vx * dt
+          pt.g.y += pt.vy * dt
+          pt.g.alpha = Math.max(0, pt.life / pt.maxLife)
+          if (pt.life <= 0) {
+            parts.splice(i, 1)
+            pt.g.destroy()
+          }
         }
 
         // Kameran: följ kaninen mjukt, håll dig innanför världen
