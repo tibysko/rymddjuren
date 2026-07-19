@@ -57,4 +57,22 @@ och bedömningsstödet i taluppfattning för åk 1:
 - [x] Planet 8: Mönsterbältet – hästen galopperar i mönstret (varje färg är en ton – mönstret hörs!), talföljder och "vilken bit upprepas?"
 - [x] Planet 9: Jätteplaneten – jättehopp i två steg via vilostationen på tian (bridging through ten) på talraden 0–20
 - [x] Planet 10: Festplaneten – blandad utmaning med frågor från alla planeter, adaptivt viktade mot de planeter som fått färst stjärnor; festlyktor tänds för varje rätt svar
+- [x] GPU-rendering med PixiJS v8 (WebGPU med automatisk WebGL-fallback, se docs/research-webgpu.md): stjärnfältet bakom spelet + guldregn på resultatskärmen, och Apornas planet som riktig canvas-bana med kamera och parallax
 - [ ] Fler djur/animationer i rymdstationen
+
+## GPU-rendering (WebGPU/WebGL)
+
+Två saker ritas med PixiJS v8 (`src/game/pixi.ts` väljer renderare):
+
+- **Effektlagret** (`SpaceBackdrop.tsx`): stjärnfält bakom hela spelet och
+  guld-/rödstjärneregn när en planet är avklarad. Ren dekoration –
+  `pointer-events: none`, respekterar `prefers-reduced-motion`.
+- **Apornas planet** (`JumpScene.tsx`): ravinhoppet som canvas-bana med mjuk
+  kamera och parallax. Knappar, Ugglis och 🔊 bor kvar i DOM.
+
+Robusthet: WebGPU provas först med en "kanarie-rendering"; misslyckas den
+(eller kraschar WebGPU senare under körning) byter spelet till WebGL och
+minns valet i localStorage. Fungerar ingen av dem faller hoppbanan tillbaka
+till den gamla DOM-versionen – matten fungerar alltid. Tvinga renderare med
+`?renderer=webgl` eller `?renderer=webgpu` i adressraden; konsolen loggar
+vilken som används.

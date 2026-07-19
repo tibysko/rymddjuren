@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import SpaceBackdrop from './components/SpaceBackdrop'
 import StarMap from './components/StarMap'
 import LevelScreen from './components/LevelScreen'
 import ResultScreen from './components/ResultScreen'
@@ -59,7 +60,10 @@ export default function App() {
   }
 
   return (
-    <div className="app">
+    <>
+      {/* Stjärnfältet bakom allt – guldregn när en planet är avklarad! */}
+      <SpaceBackdrop mode={screen === 'result' ? 'cheer' : 'calm'} />
+      <div className="app">
       {screen === 'map' && (
         <StarMap progress={progress} onPlay={handlePlay} onStation={() => setScreen('station')} />
       )}
@@ -77,6 +81,7 @@ export default function App() {
       {screen === 'station' && (
         <Station progress={progress} onBack={() => setScreen('map')} />
       )}
-    </div>
+      </div>
+    </>
   )
 }

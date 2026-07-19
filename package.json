@@ -10,6 +10,7 @@
     "build:single": "tsc -b && vite build -c vite.single.config.ts && cp dist-single/index.html spela.html"
   },
   "dependencies": {
+    "pixi.js": "^8.19.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
   },
