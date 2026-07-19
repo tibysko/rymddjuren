@@ -54,7 +54,42 @@ export interface JumpQuestion {
   answer: number
 }
 
-export type Question = ChoiceQuestion | FeedQuestion | HopQuestion | JumpQuestion
+export interface StairQuestion {
+  type: 'stair'
+  prompt: string
+  spoken: string
+  /** 'ner' = ta bort (bakåträkning), 'upp' = utfyllnad (räkna uppåt) */
+  dir: 'ner' | 'upp'
+  /** Kaninens startsteg i komettrappan */
+  start: number
+  /** Målsteget – godiset (ner) eller papegojan (upp) */
+  target: number
+  /** Lägsta trappsteg som ritas (aldrig under 0 – trappan slutar där!) */
+  lo: number
+  /** Högsta trappsteg som ritas */
+  hi: number
+  /** Antal steg att välja bland (talet = så många steg kaninen hoppar) */
+  choices: number[]
+  /** Rätt antal steg = |target - start| */
+  answer: number
+}
+
+export interface EatQuestion {
+  type: 'eat'
+  prompt: string
+  spoken: string
+  /** Godis-emoji på kalasbordet */
+  item: string
+  /** Så många godisar fanns från början */
+  total: number
+  /** Så många äter papegojan upp (synligt!) */
+  eaten: number
+  choices: number[]
+  /** Kvar = total - eaten */
+  answer: number
+}
+
+export type Question = ChoiceQuestion | FeedQuestion | HopQuestion | JumpQuestion | StairQuestion | EatQuestion
 
 export interface Level {
   id: number

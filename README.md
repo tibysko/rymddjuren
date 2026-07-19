@@ -49,7 +49,8 @@ och bedömningsstödet i taluppfattning för åk 1:
 - [x] Planet 1: Kaninplaneten – räkna antal + mata kaninen
 - [x] Planet 2: Stjärnstigen – talraden 0–20 (kaninen hoppar exakt så många hopp som barnet väljer – fel svar landar synligt fel på tallinjen, rätt svar landar på stjärnan)
 - [x] TypeScript-migrering
-- [ ] Planet 3–4: Plus & minus 0–10
+- [x] Planet 3: Apornas planet – ravinhopp där valt tal = hoppets kraft (plus 0–10, "spår B", se docs/research-plattformsspel.md)
+- [x] Planet 4: Kometkalaset – minus 0–10 på tre sätt: komettrappan ner (ta bort som bakåtrörelse, trappan slutar vid 0), kalasbordet (papegojan äter synligt upp godisar – "hur många är kvar?") och trappan upp (räkna uppåt/utfyllnad, se docs/research-planet4-kometkalaset.md)
 - [ ] Planet 5–7: Dubbelt/hälften, talkamrater, likhetstecknet
 - [ ] Planet 8–10: Mönster, tal 0–20, blandad utmaning
 - [ ] Fler djur/animationer i rymdstationen

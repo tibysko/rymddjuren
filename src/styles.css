@@ -408,6 +408,143 @@ h1 {
   transition: bottom 0.45s ease-in;
 }
 
+/* Kometkalaset – komettrappan (subtraktion som rörelse i trappan) */
+
+.stair-scene {
+  position: relative;
+  width: min(640px, 92vw);
+  height: 230px;
+  margin: 0.5rem auto;
+  border-radius: 20px;
+  overflow: hidden;
+  background: linear-gradient(#1d2a52 0%, #2b3a6b 55%, #141c3a 100%);
+}
+
+.stair-comet {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-size: 1.8rem;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.stair-col {
+  position: absolute;
+  bottom: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  width: 2.6rem;
+}
+
+/* Trappsteget – höjden ÄR talet, så trappan blir en synlig tallinje på höjden */
+.stair-step {
+  display: block;
+  width: 2.6rem;
+  background: linear-gradient(#7f9be0, #4a5f9e);
+  border-top: 4px solid #aec4ff;
+  border-radius: 6px 6px 0 0;
+}
+
+.stair-col.goal .stair-step {
+  background: linear-gradient(#c8912f, #8a5f1a);
+  border-top-color: var(--accent-yellow);
+}
+
+.stair-num {
+  position: absolute;
+  bottom: 4px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #f7f0d8;
+  text-shadow: 0 1px 2px #000a;
+  pointer-events: none;
+}
+
+.stair-goal-emoji {
+  position: absolute;
+  font-size: 1.5rem;
+  animation: bounce 0.9s infinite alternate;
+  pointer-events: none;
+}
+
+.stair-rabbit {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 2.1rem;
+  line-height: 1;
+  z-index: 2;
+  filter: drop-shadow(0 3px 3px #0007);
+  transition: left 0.4s ease, bottom 0.4s ease;
+}
+
+/* Landade på fel trappsteg – skaka till så att felet syns */
+.stair-rabbit.oops {
+  animation: shake 0.5s 2;
+}
+
+/* Kometkalaset – kalasbordet (papegojan äter synligt upp godisar) */
+
+.party-scene {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
+  padding: 1rem 1.4rem;
+}
+
+.party-parrot {
+  font-size: 3.5rem;
+  transition: transform 0.2s;
+}
+
+/* Papegojan gnussar fram och tillbaka medan den äter */
+.party-parrot.munching {
+  animation: munch 0.7s infinite;
+}
+
+@keyframes munch {
+  0%, 100% { transform: rotate(0) translateY(0); }
+  50% { transform: rotate(-12deg) translateY(6px); }
+}
+
+.party-table {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  max-width: 380px;
+  background: rgba(255, 211, 42, 0.12);
+  border-bottom: 6px solid #8a5f1a;
+  border-radius: 12px;
+  padding: 0.7rem;
+}
+
+.candy {
+  font-size: 2.4rem;
+  transition: opacity 0.5s, filter 0.5s;
+}
+
+/* Uppäten – borta, men platsen finns kvar så mönstret inte hoppar */
+.candy.gone {
+  opacity: 0;
+}
+
+/* Andra chansen: uppätna godisar som bleka spöken – räkningshjälp */
+.candy.ghost {
+  opacity: 0.25;
+  filter: grayscale(1);
+}
+
+/* Medan papegojan äter: vänta med att svara */
+.choices.waiting {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
 /* Mata djuret */
 
 .feed-animal {

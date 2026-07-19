@@ -39,16 +39,47 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
   const [jumpY, setJumpY] = useState(0)
   const [jumpFell, setJumpFell] = useState(false) // föll ner i ravinen
   const jumpRaf = useRef<number | undefined>(undefined)
+  // Komettrappan (Kometkalaset): kaninens trappsteg + "oj!"-skak vid fel landning
+  const [stairPos, setStairPos] = useState<number | null>(null)
+  const [stairOops, setStairOops] = useState(false)
+  // Kalasbordet: hur många godisar papegojan ätit hittills (animeras synligt)
+  const [eatenSoFar, setEatenSoFar] = useState(0)
+  const [eating, setEating] = useState(false)
+  const eatTimer = useRef<ReturnType<typeof setInterval> | undefined>(undefined)
 
   const q = questions[index]
 
   useEffect(
     () => () => {
       clearInterval(hopTimer.current)
+      clearInterval(eatTimer.current)
       if (jumpRaf.current !== undefined) cancelAnimationFrame(jumpRaf.current)
     },
     [],
   )
+
+  // Kalasbordet: när en ät-fråga visas äter papegojan upp godisarna en i taget,
+  // synligt, INNAN barnet svarar – "ta bort" blir en händelse, inte en siffra.
+  useEffect(() => {
+    if (q.type !== 'eat') return
+    setEatenSoFar(0)
+    setEating(true)
+    const startDelay = setTimeout(() => {
+      let n = 0
+      eatTimer.current = setInterval(() => {
+        n += 1
+        setEatenSoFar(n)
+        if (n >= q.eaten) {
+          clearInterval(eatTimer.current)
+          setEating(false)
+        }
+      }, 700)
+    }, 900)
+    return () => {
+      clearTimeout(startDelay)
+      clearInterval(eatTimer.current)
+    }
+  }, [q])
 
   function nextQuestion(wasFirstTry: boolean) {
     if (wasFirstTry) setFirstTryCorrect((n) => n + 1)
@@ -63,6 +94,8 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
       setJumpX(null)
       setJumpY(0)
       setJumpFell(false)
+      setStairPos(null)
+      setStairOops(false)
       setAttempted(false)
       setLocked(false)
       if (index + 1 >= questions.length) {
@@ -192,6 +225,69 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
       }, 2300)
     }
     jumpRaf.current = requestAnimationFrame(step)
+  }
+
+  // Komettrappan: kaninen studsar ALLTID exakt så många steg som barnet väljer,
+  // ett steg i taget, och Ugglis räknar varje tal högt ("åtta… sju… sex!").
+  // Fel svar → kaninen stannar synligt på fel trappsteg. Trappan slutar vid 0,
+  // så det GÅR inte att ta bort mer än man har.
+  function answerStair(choice: number) {
+    if (locked) return
+    if (q.type !== 'stair') return
+    setLocked(true)
+    setStairOops(false)
+    const wasFirstTry = !attempted
+    const dir = q.dir === 'ner' ? -1 : 1
+    const landing = q.start + dir * choice
+    let pos = q.start
+    hopTimer.current = setInterval(() => {
+      pos += dir
+      setStairPos(pos)
+      speak(String(pos)) // Ugglis räknar stegen högt – barnet hör talraden
+      if (pos === landing) {
+        clearInterval(hopTimer.current)
+        if (landing === q.target) {
+          setLocked(false)
+          nextQuestion(wasFirstTry)
+        } else {
+          // Landade på fel trappsteg – låt det synas, hoppa sen tillbaka
+          setStairOops(true)
+          setWrongChoice(choice)
+          setAttempted(true)
+          const thing = q.dir === 'ner' ? 'godiset' : 'papegojan'
+          const word = q.dir === 'ner' ? 'steg' : 'hopp'
+          const short = dir === -1 ? landing > q.target : landing < q.target
+          setFeedback({
+            text: short
+              ? `Oj! ${choice} ${word} räckte inte till ${thing}. Prova igen!`
+              : `Oj! ${choice} ${word} var för många – kaninen for förbi ${thing}! Prova igen!`,
+            happy: false,
+          })
+          setTimeout(() => {
+            setFeedback(null)
+            setStairOops(false)
+            setStairPos(q.start)
+            setWrongChoice(null)
+            setLocked(false)
+          }, 2300)
+        }
+      }
+    }, 550)
+  }
+
+  // Kalasbordet: fel svar → de uppätna godisarna visas som bleka spöken,
+  // så barnet kan räkna både de som är kvar och de som är borta.
+  function answerEat(choice: number) {
+    if (locked || eating) return
+    if (q.type !== 'eat') return
+    if (choice === q.answer) {
+      nextQuestion(!attempted)
+    } else {
+      setWrongChoice(choice)
+      setAttempted(true)
+      setFeedback({ text: 'Titta! De bleka är uppätna. Räkna dem som är kvar!', happy: false })
+      setTimeout(() => setFeedback(null), 2500)
+    }
   }
 
   function toggleFeed(i: number) {
@@ -328,6 +424,80 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
                 key={c}
                 className={`choice-btn ${wrongChoice === c ? 'wrong' : ''}`}
                 onClick={() => answerJump(c)}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
+      {q.type === 'stair' && (
+        <>
+          <div className="stair-scene">
+            <span className="stair-comet">☄️</span>
+            {Array.from({ length: q.hi - q.lo + 1 }).map((_, i) => {
+              const n = q.lo + i
+              const leftPct = ((n - q.lo + 0.5) / (q.hi - q.lo + 1)) * 100
+              const h = 16 + n * 14 // trappsteg n:s höjd i px – höjden ÄR talet
+              return (
+                <div key={n} className={`stair-col ${n === q.target ? 'goal' : ''}`} style={{ left: `${leftPct}%` }}>
+                  {n === q.target && (
+                    <span className="stair-goal-emoji" style={{ bottom: `${h + 2}px` }}>
+                      {q.dir === 'ner' ? '🍬' : '🦜'}
+                    </span>
+                  )}
+                  <span className="stair-step" style={{ height: `${h}px` }} />
+                  <span className="stair-num">{n}</span>
+                </div>
+              )
+            })}
+            <span
+              className={`stair-rabbit ${stairOops ? 'oops' : ''}`}
+              style={{
+                left: `${(((stairPos ?? q.start) - q.lo + 0.5) / (q.hi - q.lo + 1)) * 100}%`,
+                bottom: `${16 + (stairPos ?? q.start) * 14 + 2}px`,
+              }}
+            >
+              🐰
+            </span>
+          </div>
+          <div className="choices">
+            {q.choices.map((c) => (
+              <button
+                key={c}
+                className={`choice-btn ${wrongChoice === c ? 'wrong' : ''}`}
+                onClick={() => answerStair(c)}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
+      {q.type === 'eat' && (
+        <>
+          <div className="party-scene">
+            <span className={`party-parrot ${eating ? 'munching' : ''}`}>🦜</span>
+            <div className="party-table">
+              {Array.from({ length: q.total }).map((_, i) => {
+                const isEaten = i >= q.total - eatenSoFar
+                return (
+                  <span key={i} className={`candy ${isEaten ? (attempted ? 'ghost' : 'gone') : ''}`}>
+                    {q.item}
+                  </span>
+                )
+              })}
+            </div>
+            <span className="party-table-leg" />
+          </div>
+          <div className={`choices ${eating ? 'waiting' : ''}`}>
+            {q.choices.map((c) => (
+              <button
+                key={c}
+                className={`choice-btn ${wrongChoice === c ? 'wrong' : ''}`}
+                onClick={() => answerEat(c)}
               >
                 {c}
               </button>

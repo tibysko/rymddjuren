@@ -1,6 +1,6 @@
 // Planeterna i Rymddjuren – mappade mot Lgr22 åk 1 (se DESIGN.md)
 
-import type { ChoiceQuestion, FeedQuestion, HopQuestion, JumpQuestion, Level, Question } from './types'
+import type { ChoiceQuestion, EatQuestion, FeedQuestion, HopQuestion, JumpQuestion, Level, Question, StairQuestion } from './types'
 
 function randInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min
@@ -157,6 +157,89 @@ function genLevel3(): Question[] {
   return questions
 }
 
+// ---- Bana 4: Kometkalaset – subtraktion 0–10 (se docs/research-planet4-kometkalaset.md) ----
+//
+// Tre mekaniker som visar samma subtraktion från tre håll:
+// 1. Komettrappan NER – ta bort som bakåtrörelse (arvtagare till ravinhoppet).
+//    Trappan slutar vid 0, så barnet ser att man inte kan ta bort mer än man har.
+// 2. Kalasbordet – papegojan äter synligt upp godisar: "Hur många är kvar?"
+// 3. Komettrappan UPP – utfyllnad ("från 5 upp till 8"), counting up-strategin
+//    som forskningen rekommenderar. Bakåträkning får aldrig dominera banan.
+
+function genStairDownQuestion(): StairQuestion {
+  const answer = randInt(1, 5) // differenser 1–5 – större är för svårt i åk 1-start
+  // start ≥ 3 så att makeChoices(answer, 1, start) alltid kan skapa 3 olika alternativ
+  const start = randInt(Math.max(answer, 3), 9)
+  const target = start - answer
+  // Alla valbara hopp måste landa på trappan (aldrig under 0)
+  const choices = makeChoices(answer, 1, start)
+  const maxChoice = Math.max(...choices)
+  const lo = Math.max(0, start - maxChoice - 1)
+  const hi = Math.min(10, start + 1)
+  return {
+    type: 'stair',
+    dir: 'ner',
+    prompt: `Kaninen står på ${start}, godiset på ${target}. Hur många steg ner?`,
+    spoken: `Kalas på kometen! Kaninen står på talet ${start} och godispåsen ligger på talet ${target}. Hur många steg ner ska kaninen hoppa?`,
+    start,
+    target,
+    lo,
+    hi,
+    choices,
+    answer,
+  }
+}
+
+function genStairUpQuestion(): StairQuestion {
+  const answer = randInt(1, 4)
+  const start = randInt(0, Math.min(7, 9 - answer))
+  const target = start + answer
+  // Alla valbara hopp måste rymmas på trappan (aldrig över 10)
+  const choices = makeChoices(answer, 1, 10 - start)
+  const maxChoice = Math.max(...choices)
+  const lo = Math.max(0, start - 1)
+  const hi = Math.min(10, start + maxChoice + 1)
+  return {
+    type: 'stair',
+    dir: 'upp',
+    prompt: `Kaninen står på ${start}, papegojan på ${target}. Hur många hopp upp?`,
+    spoken: `Stjärnpapegojan sitter högre upp i komettrappan! Kaninen står på talet ${start} och papegojan sitter på talet ${target}. Hur många hopp upp behövs?`,
+    start,
+    target,
+    lo,
+    hi,
+    choices,
+    answer,
+  }
+}
+
+const PARTY_ITEMS = ['🍬', '🍭', '🧁']
+
+function genEatQuestion(): EatQuestion {
+  const total = randInt(3, 8)
+  const eaten = randInt(1, Math.min(5, total))
+  const answer = total - eaten // kan bli 0 – "alla är uppätna!" är en viktig upptäckt
+  const item = PARTY_ITEMS[randInt(0, PARTY_ITEMS.length - 1)]
+  return {
+    type: 'eat',
+    prompt: 'Hur många är kvar?',
+    spoken: `Det låg ${total} godisar på kalasbordet. Papegojan åt upp ${eaten}! Hur många godisar är kvar?`,
+    item,
+    total,
+    eaten,
+    choices: makeChoices(answer, 0, total),
+    answer,
+  }
+}
+
+function genLevel4(): Question[] {
+  const questions: Question[] = []
+  for (let i = 0; i < 4; i++) questions.push(genStairDownQuestion())
+  for (let i = 0; i < 3; i++) questions.push(genEatQuestion())
+  for (let i = 0; i < 3; i++) questions.push(genStairUpQuestion())
+  return shuffle(questions)
+}
+
 // ---- Planetlistan ----
 
 export const LEVELS: Level[] = [
@@ -179,7 +262,7 @@ export const LEVELS: Level[] = [
     generate: genLevel2,
   },
   { id: 3, name: 'Apornas planet', animal: '🐵', animalName: 'Rymdapa', color: '#ff9f43', desc: 'Plus 0–10', generate: genLevel3 },
-  { id: 4, name: 'Kometkalaset', animal: '🦜', animalName: 'Stjärnpapegoja', color: '#54a0ff', desc: 'Minus 0–10', generate: null },
+  { id: 4, name: 'Kometkalaset', animal: '🦜', animalName: 'Stjärnpapegoja', color: '#54a0ff', desc: 'Minus 0–10', generate: genLevel4 },
   { id: 5, name: 'Tvillingplaneten', animal: '🐼', animalName: 'Rymdpanda', color: '#5f27cd', desc: 'Dubbelt & hälften', generate: null },
   { id: 6, name: 'Kompisplaneten', animal: '🦊', animalName: 'Stjärnräv', color: '#ee5253', desc: 'Talkamrater', generate: null },
   { id: 7, name: 'Vågplaneten', animal: '🦎', animalName: 'Rymdödla', color: '#10ac84', desc: 'Lika mycket =', generate: null },
