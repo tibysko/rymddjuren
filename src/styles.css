@@ -24,6 +24,16 @@ body {
   background-attachment: fixed;
   color: var(--text);
   min-height: 100vh;
+  /* Spel, inte text: långtryck ska inte markera emojis eller visa lupp */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+button {
+  /* Snabba dubbeltryck ska trycka två gånger – inte zooma in sidan */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .app {
