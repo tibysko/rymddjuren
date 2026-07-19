@@ -11,6 +11,18 @@ npm run dev
 
 Öppna sedan adressen som visas (vanligtvis http://localhost:5173).
 
+## Spela på mobilen (GitHub Pages)
+
+Spelet publiceras automatiskt vid varje push till `main`: workflowen
+`.github/workflows/pages.yml` bygger enfilsversionen (`npm run build:single`)
+och lägger upp `spela.html` som startsida på GitHub Pages.
+
+- Adress: `https://<github-användarnamn>.github.io/rymddjuren/`
+- Spara adressen som ikon på mobilens hemskärm ("Lägg till på hemskärmen")
+  så funkar det som en app
+- `npm run build:single` skapar även `spela.html` lokalt – hela spelet i en
+  fil som funkar utan server
+
 ## Vad ska spelet träna? (Lgr22, åk 1)
 
 Baserat på Skolverkets kursplan i matematik (Lgr22, centralt innehåll åk 1–3)
