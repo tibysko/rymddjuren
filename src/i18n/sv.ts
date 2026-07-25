@@ -9,6 +9,29 @@
 // Strings that need numbers or names are functions; plain strings are
 // constants. Grouped by where they appear.
 
+/** Small numbers spelled out – reads better aloud than digits for a 7-year-old */
+const NUMBER_WORDS = [
+  'noll',
+  'ett',
+  'två',
+  'tre',
+  'fyra',
+  'fem',
+  'sex',
+  'sju',
+  'åtta',
+  'nio',
+  'tio',
+]
+
+function numberWord(n: number): string {
+  return NUMBER_WORDS[n] ?? String(n)
+}
+
+function capitalize(word: string): string {
+  return word.charAt(0).toUpperCase() + word.slice(1)
+}
+
 export const sv = {
   // ---- Star map ----
   map: {
@@ -29,6 +52,33 @@ export const sv = {
     title: '🛰️ Min rymdstation',
     empty: 'Här är det tomt än! Klara en planet så flyttar ett djur in.',
     back: '⬅️ Tillbaka',
+    speakLabel: 'Läs upp',
+    /** Under the station picture: "7 av 10 djur bor här" */
+    counter: (collected: number, total: number) => `${collected} av ${total} djur bor här`,
+    /** Ugglis greets you with a line that depends on how full the station is
+        (`empty` above is her line when no animal has moved in yet) */
+    ugglisSome: (collected: number, left: number) =>
+      `${capitalize(numberWord(collected))} djur bor här! Bara ${numberWord(left)} kvar!`,
+    ugglisFull: 'Hela rymden är här! Hurra!',
+    /** Small hint above the animal cards */
+    tapHint: 'Tryck på ett djur!',
+    /** The dark silhouette card: the animal that moves in next */
+    nextLabel: 'Vem kommer sen?',
+    /** The fully hidden cards after the next one */
+    unknownLabel: 'Hemligt',
+    /** One short riddle per animal – Ugglis reads it for the silhouette card */
+    riddles: {
+      1: 'Vem har långa öron och hoppar högt?',
+      2: 'Vem går långsamt och har ett hus på ryggen?',
+      3: 'Vem klättrar och älskar bananer?',
+      4: 'Vem har granna fjädrar och kan härma dig?',
+      5: 'Vem är svart och vit och äter bambu?',
+      6: 'Vem är röd och listig och har en yvig svans?',
+      7: 'Vem är liten och grön och solar på en sten?',
+      8: 'Vem galopperar och har man och svans?',
+      9: 'Vem har stor man och ryter högt?',
+      10: 'Vem är jättestor och har lång snabel?',
+    } as Record<number, string>,
   },
 
   // ---- Result screen ----

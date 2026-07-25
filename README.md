@@ -14,6 +14,25 @@ npm run dev
 
 Then open the address that appears (usually http://localhost:5173).
 
+## Generate speech files
+
+The fixed Swedish voice lines can be generated as standalone audio files with
+the OpenAI Speech API. This is an offline asset-generation tool only; generated
+files are not currently used by the game.
+
+```bash
+export OPENAI_API_KEY="..."
+npm run generate:speech -- --dry-run
+npm run generate:speech
+```
+
+The command writes MP3 files to `generated-speech/`, skips existing files and
+never sends the API key to the browser. Use `--force` to replace files,
+`--speed 0.9` for slower speech or `--only feedback/cheer-` to generate a
+subset. Run `npm run generate:speech -- --help` for model, voice, format and
+output options. `--name` together with `--text` creates one ad hoc pronunciation
+test. All production speech text is still sourced from `src/i18n/sv.ts`.
+
 ## Play on the phone (GitHub Pages)
 
 The game is published automatically on every push to `main`: the
@@ -61,7 +80,34 @@ content for Years 1–3) and the Year 1 assessment support material for number s
 - [x] Planet 9: the Giant Planet (Jätteplaneten) – giant jumps in two steps via the rest station at ten (bridging through ten) on the number line 0–20
 - [x] Planet 10: the Party Planet (Festplaneten) – mixed challenge with questions from all the planets, adaptively weighted towards the planets that have earned the fewest stars; party lanterns light up for every correct answer
 - [x] GPU rendering with PixiJS v8 (WebGPU with automatic WebGL fallback, see docs/research-webgpu.md): the starfield behind the game + golden rain on the results screen, and the Monkey Planet as a real canvas level with camera and parallax
-- [ ] More animals/animations in the space station
+- [x] The space station is alive (`Station.tsx`): the animals float weightlessly and wiggle now and then, tapping one makes it bounce, burst into stars (`cheerBurst()`) and say its name out loud, the hull grows one lit module per animal above a "X av 10 djur bor här" counter, every card shows the stars earned on that planet framed in the planet's colour, Ugglis lives there with a 🔊 button and a line that follows the collection, the next animal is teased as a dark silhouette with a spoken riddle while the ones after it stay secret ❓, and a full station is greeted with a few seconds of golden rain
+- [x] Ugglis has an original red-and-gold astronaut illustration, generated as a game asset and reused consistently on the map, in answer feedback, on the results screen and in the space station
+- [x] The game tests itself (`npm test`, `tests/`): Playwright builds the production version, serves it and plays it in a phone-sized browser. A bot plays all ten planets from the first question to the results screen – it waits for each animation to finish, answers, and if Ugglis says "try again" it rules that answer out and picks another – while the tests watch for browser errors. On top of that come the rules of the space station and a screenshot of every screen. See [Tests](#tests).
+
+## Tests
+
+```bash
+npx playwright install chromium   # once
+npm test                          # everything, about five minutes
+npm run test:ui                   # watch the bot play, step by step
+npm run test:report               # the report from the last run
+npm run test:update               # accept new screenshots after a deliberate change
+```
+
+- `tests/game.ts` – the save files to start from and the bot that plays a level.
+  It only knows what the screen shows: the prompt says how many carrots to feed,
+  the fox says which sum it wants, the seesaw has to be shared evenly, and
+  everything else it works out by elimination (every question offers three
+  choices, so at most three tries).
+- `tests/planets.spec.ts` – one test per planet, played all the way through.
+- `tests/station.spec.ts` – the rules of the space station.
+- `tests/visual.spec.ts` – screenshots, taken with reduced motion asked for so
+  the starfield does not move (and does not draw random numbers) between runs.
+  The pictures live in `tests/visual.spec.ts-snapshots/` and belong in git; they
+  are machine-specific (`…-chromium-darwin.png`).
+
+The tests must never drive the game's design: if a test is awkward to write,
+change the test, not the game.
 
 ## GPU rendering (WebGPU/WebGL)
 

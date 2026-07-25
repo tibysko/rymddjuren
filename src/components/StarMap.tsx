@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react'
 import { LEVELS } from '../game/levels'
 import type { Level, Progress } from '../game/types'
 import { sv } from '../i18n/sv'
+import Ugglis from './Ugglis'
 
 interface Props {
   progress: Progress
@@ -35,7 +36,7 @@ export default function StarMap({ progress, onPlay, onStation }: Props) {
       </header>
 
       <p className="ugglis-hello">
-        <span className="ugglis">🦉</span> {sv.map.greeting}
+        <Ugglis /> {sv.map.greeting}
       </p>
 
       <div className="planets">

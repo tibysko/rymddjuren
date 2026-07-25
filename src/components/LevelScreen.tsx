@@ -5,6 +5,7 @@ import { QUESTIONS_PER_LEVEL, starsFor } from '../game/levels'
 import { speak } from '../game/speech'
 import type { Level } from '../game/types'
 import { sv } from '../i18n/sv'
+import Ugglis from './Ugglis'
 import { BalanceScene, DoubleScene, PairScene, PatternScene, ShareScene, Via10Scene } from './scenes'
 import JumpScene from './JumpScene'
 
@@ -480,7 +481,7 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
 
       {feedback && (
         <div className={`ugglis-feedback ${feedback.happy ? 'happy' : 'oops'}`}>
-          <span className="ugglis">🦉</span> {feedback.text}
+          <Ugglis /> {feedback.text}
         </div>
       )}
     </div>

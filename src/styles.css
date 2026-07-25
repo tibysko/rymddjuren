@@ -55,7 +55,12 @@ h1 {
 }
 
 .ugglis {
-  font-size: 1.6rem;
+  display: inline-block;
+  width: 3.4rem;
+  height: 3.4rem;
+  object-fit: contain;
+  vertical-align: middle;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.35));
 }
 
 .dev-badge {
@@ -1124,31 +1129,202 @@ h1 {
   to { transform: translateY(-12px); }
 }
 
-.station-empty {
+/* The space station: heading with a speaker button, the hull that grows,
+   Ugglis, and the animal cards */
+
+.station-heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+}
+
+.station-heading h1 {
+  margin: 0;
+}
+
+.station-hull {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.station-core {
+  font-size: 3.2rem;
+}
+
+.station-modules {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.15rem;
+}
+
+/* One module per planet: dim until its animal has moved in */
+.station-module {
+  font-size: 1.5rem;
+  opacity: 0.3;
+  filter: grayscale(1);
+}
+
+.station-module.on {
+  opacity: 1;
+  filter: none;
+  animation: module-glow 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes module-glow {
+  from { filter: drop-shadow(0 0 2px rgba(255, 211, 42, 0.45)); }
+  to { filter: drop-shadow(0 0 10px rgba(255, 211, 42, 0.95)); }
+}
+
+.station-counter {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--accent-yellow);
+}
+
+.station-ugglis {
+  margin: 0;
+  max-width: 460px;
   font-size: 1.2rem;
-  max-width: 400px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 0.75rem 1rem;
+}
+
+.station-hint {
+  margin: -0.7rem 0 0;
+  font-size: 1rem;
+  opacity: 0.8;
 }
 
 .station-animals {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 0.9rem;
+  width: 100%;
 }
 
 .station-animal {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 0.3rem;
+  min-height: 140px;
   background: rgba(255, 255, 255, 0.08);
+  border: 3px solid transparent;
   border-radius: 20px;
-  padding: 1rem 1.4rem;
+  padding: 0.9rem 0.6rem;
+  font-family: inherit;
   font-weight: 700;
+  color: inherit;
+}
+
+/* An animal that lives here: framed in its planet's colour and tappable */
+.station-animal.home {
+  border-color: var(--animal-color);
+  box-shadow: 0 0 20px -6px var(--animal-color);
+  cursor: pointer;
+}
+
+.station-animal.home:active {
+  transform: scale(0.96);
 }
 
 .station-animal-emoji {
   font-size: 3rem;
+  display: inline-block;
+}
+
+.station-animal-name {
+  font-size: 0.95rem;
+}
+
+.station-animal-stars {
+  display: flex;
+  gap: 0.1rem;
+}
+
+.station-animal-stars .star {
+  font-size: 1rem;
+}
+
+/* Weightless bobbing – each animal with its own tempo so they are out of sync */
+.station-animal.home .station-animal-emoji {
+  animation: float var(--float-time, 3.4s) ease-in-out var(--float-delay, 0s) infinite alternate;
+}
+
+/* Now and then one animal wiggles on its own */
+.station-animal.wiggling .station-animal-emoji {
+  animation: animal-wiggle 0.9s ease-in-out;
+}
+
+/* Tapped: a big happy bounce */
+.station-animal.cheering .station-animal-emoji {
+  animation: animal-cheer 0.7s ease-out;
+}
+
+@keyframes float {
+  from { transform: translateY(5px) rotate(-2deg); }
+  to { transform: translateY(-10px) rotate(2deg); }
+}
+
+@keyframes animal-wiggle {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(-13deg); }
+  45% { transform: rotate(13deg); }
+  70% { transform: rotate(-6deg); }
+}
+
+@keyframes animal-cheer {
+  0% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-26px) scale(1.25); }
+  55% { transform: translateY(0) scale(1); }
+  75% { transform: translateY(-12px) scale(1.12); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* The next animal in line: a dark silhouette to guess from + a spoken riddle */
+.station-animal.next {
+  border-color: rgba(255, 255, 255, 0.35);
+  border-style: dashed;
+  cursor: pointer;
+}
+
+.station-animal-emoji.silhouette {
+  filter: brightness(0) drop-shadow(0 0 7px rgba(255, 255, 255, 0.8));
+  animation: float 4s ease-in-out infinite alternate;
+}
+
+.station-animal-riddle {
+  font-size: 0.78rem;
+  font-weight: 600;
+  opacity: 0.85;
+  line-height: 1.2;
+}
+
+/* The animals after the next one stay a secret */
+.station-animal.unknown {
+  opacity: 0.35;
+}
+
+.station-animal.unknown .station-animal-emoji {
+  font-size: 2.4rem;
+}
+
+/* Everything stands still for anyone who wants less motion */
+@media (prefers-reduced-motion: reduce) {
+  .station-module.on,
+  .station-animal.home .station-animal-emoji,
+  .station-animal.wiggling .station-animal-emoji,
+  .station-animal.cheering .station-animal-emoji,
+  .station-animal-emoji.silhouette {
+    animation: none;
+  }
 }
 
 /* ---- The PixiJS layers (WebGPU with a WebGL fallback) ---- */

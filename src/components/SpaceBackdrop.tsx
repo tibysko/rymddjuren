@@ -278,7 +278,7 @@ export default function SpaceBackdrop({ mode }: { mode: BackdropMode }) {
     const offFallback = onRendererFallback(() => {
       if (disposed) return
       if (app) {
-        app.destroy(true, { children: true, texture: true })
+        app.destroy({ removeView: true }, { children: true, texture: true })
         app = null
       }
       document.body.classList.remove('gpu-stars')
@@ -291,7 +291,7 @@ export default function SpaceBackdrop({ mode }: { mode: BackdropMode }) {
       registerBurst(null)
       document.body.classList.remove('gpu-stars')
       if (app) {
-        app.destroy(true, { children: true, texture: true })
+        app.destroy({ removeView: true }, { children: true, texture: true })
         app = null
       }
     }

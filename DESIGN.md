@@ -22,15 +22,17 @@ player's **space station**, which grows and becomes more lively.
 - gives the instructions (short text + 🔊 read-aloud)
 - cheers you on and comforts you ("Bra jobbat!", "Nästan! Prova igen!")
 - larks about and celebrates when things are going well
+- has an original red-and-gold astronaut illustration generated for the game,
+  shown consistently on the map, in feedback, at results and in the station
 
 ## Game loop
 
 1. The star map shows the planets. The player picks the next unlocked planet.
 2. One planet = about 10 short tasks, one at a time, large buttons.
-3. Many tasks are about **feeding the animals** (drag/pick the right number).
+3. Many tasks are about **feeding the animals** (pick the right number – all input is taps, no dragging, per the one-button rule).
 4. Wrong answer → a second chance with gentle help (e.g. showing dots to count).
 5. Planet completed → 1–3 stars ⭐ + **the animal comes along to the space station**.
-6. The space station is the collection page – all the animals are shown and animated there.
+6. The space station is the collection page – the animals float there and cheer when tapped, the station hull grows one lit module per animal, and the next animal is teased as a dark silhouette with a riddle while the ones after it stay secret.
 
 ## Planets → Lgr22 (Year 1)
 
@@ -38,7 +40,7 @@ player's **space station**, which grows and becomes more lively.
 |---|---|---|
 | 1. the Rabbit Planet (Kaninplaneten) | 🐰 Moon Rabbit (Månkanin) | Linking quantity to numeral, 1–10 |
 | 2. the Star Path (Stjärnstigen) | 🐢 Space Turtle (Rymdsköldpadda) | The number line 0–20, which number is missing, neighbours |
-| 3. the Monkey Planet (Apornas planet) | 🐵 Space Monkey (Rymdapa) | Addition 0–10 – feed the monkeys with space bananas |
+| 3. the Monkey Planet (Apornas planet) | 🐵 Space Monkey (Rymdapa) | Addition 0–10 – jump across the ravine to the monkey: the chosen number = the jump's power |
 | 4. the Comet Party (Kometkalaset) | 🦜 Star Parrot (Stjärnpapegoja) | Subtraction 0–10 – who ate up the sweets? |
 | 5. the Twin Planet (Tvillingplaneten) | 🐼 Space Panda (Rymdpanda) | Doubles and halves – share the food equally |
 | 6. the Friend Planet (Kompisplaneten) | 🦊 Star Fox (Stjärnräv) | Number bonds, e.g. 7 = 3 + 4 |
@@ -58,6 +60,8 @@ player's **space station**, which grows and becomes more lively.
 - Very short, simple sentences: "Hur många?", "Mata apan!"
 - The tasks are always shown visually (animals/fruit to count), not just numerals
 - Speech synthesis (Swedish) reads everything aloud via the 🔊 button
+- Fixed Swedish lines can be exported with the OpenAI Speech API for future
+  prerecorded audio; the generated files are not integrated into the game yet
 
 ## Reward details
 

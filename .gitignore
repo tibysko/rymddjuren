@@ -4,3 +4,8 @@ _to_delete
 .DS_Store
 *.local
 dist-single
+test-results
+playwright-report
+blob-report
+tsconfig.tsbuildinfo
+generated-speech

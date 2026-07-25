@@ -4,6 +4,7 @@ import StarMap from './components/StarMap'
 import LevelScreen from './components/LevelScreen'
 import ResultScreen from './components/ResultScreen'
 import Station from './components/Station'
+import { LEVELS } from './game/levels'
 import type { Level, Progress } from './game/types'
 import { sv } from './i18n/sv'
 
@@ -32,6 +33,11 @@ export default function App() {
   const [progress, setProgress] = useState<Progress>(loadProgress)
   const [currentLevel, setCurrentLevel] = useState<Level | null>(null)
   const [lastResult, setLastResult] = useState<LastResult | null>(null)
+  // A short shower of gold when you enter a station where every animal lives.
+  // Only a few seconds – this is a screen the child stays on, so the rain
+  // settles back into the calm starfield instead of running forever.
+  const [stationParty, setStationParty] = useState(false)
+  const stationFull = (progress.animals?.length || 0) >= LEVELS.length
 
   function saveProgress(next: Progress) {
     setProgress(next)
@@ -54,6 +60,16 @@ export default function App() {
     return () => clearTimeout(id)
   }, [screen])
 
+  useEffect(() => {
+    if (screen !== 'station' || !stationFull) {
+      setStationParty(false)
+      return
+    }
+    setStationParty(true)
+    const id = setTimeout(() => setStationParty(false), 4000)
+    return () => clearTimeout(id)
+  }, [screen, stationFull])
+
   function handleLevelDone(stars: number, correct: number) {
     if (!currentLevel) return
     const prevStars = progress.stars[currentLevel.id] || 0
@@ -70,7 +86,15 @@ export default function App() {
   return (
     <>
       {/* The starfield behind everything – hyperspace on the way to the planet, golden rain once it is cleared! */}
-      <SpaceBackdrop mode={screen === 'result' ? 'cheer' : screen === 'travel' ? 'travel' : 'calm'} />
+      <SpaceBackdrop
+        mode={
+          screen === 'result' || stationParty
+            ? 'cheer'
+            : screen === 'travel'
+              ? 'travel'
+              : 'calm'
+        }
+      />
       <div className="app">
       {screen === 'map' && (
         <StarMap progress={progress} onPlay={handlePlay} onStation={() => setScreen('station')} />

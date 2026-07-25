@@ -65,7 +65,7 @@ function JumpScenePixi({ q, locked, onRight, onWrong, onFail }: Props & { onFail
         return
       }
       if (disposed || !holder.current) {
-        app.destroy(true, { children: true, texture: true })
+        app.destroy({ removeView: true }, { children: true, texture: true })
         return
       }
       holder.current.appendChild(app.canvas)
@@ -324,7 +324,11 @@ function JumpScenePixi({ q, locked, onRight, onWrong, onFail }: Props & { onFail
       timers.forEach((id) => clearTimeout(id))
       jumpRef.current = () => {}
       if (app) {
-        app.destroy(true, { children: true, texture: true })
+        // `{ removeView: true }` and NOT `true`: passing `true` here makes Pixi
+        // release its GLOBAL texture pool, which the starfield behind the game
+        // is still using. That threw "Cannot read properties of undefined" the
+        // moment a monkey question was followed by any other kind (planet 10).
+        app.destroy({ removeView: true }, { children: true, texture: true })
         app = null
       }
     }

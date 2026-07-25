@@ -1,5 +1,6 @@
 import type { Level } from '../game/types'
 import { sv } from '../i18n/sv'
+import Ugglis from './Ugglis'
 
 interface Props {
   level: Level
@@ -25,7 +26,7 @@ export default function ResultScreen({ level, stars, newAnimal, onBack }: Props)
         </p>
       )}
       <p className="ugglis-hello">
-        <span className="ugglis">🦉</span> {sv.result.praise}
+        <Ugglis /> {sv.result.praise}
       </p>
       <button className="big-btn" onClick={onBack}>
         {sv.result.back}
