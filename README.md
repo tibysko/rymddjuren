@@ -71,7 +71,7 @@ content for Years 1–3) and the Year 1 assessment support material for number s
 - [x] Planet 1: the Rabbit Planet (Kaninplaneten) – count quantities + feed the rabbit
 - [x] Planet 2: the Star Path (Stjärnstigen) – the number line 0–20 (the rabbit hops exactly as many hops as the child picks – a wrong answer lands visibly wrong on the number line, a correct answer lands on the star)
 - [x] TypeScript migration
-- [x] Planet 3: the Monkey Planet (Apornas planet) – ravine jumping where the chosen number = the power of the jump (plus 0–10, "track B", see docs/research-platformer.md)
+- [x] Planet 3: the Monkey Planet (Apornas planet) – ravine jumping where the chosen number = the power of the jump (plus 0–10, "track B", see docs/research-platformer.md), with a responsive canvas that fits a phone screen without sideways scrolling
 - [x] Planet 4: the Comet Party (Kometkalaset) – minus 0–10 in three ways: the comet stairs going down (taking away as backward movement, the stairs stop at 0), the party table (the parrot visibly eats up the sweets – "hur många är kvar?") and the stairs going up (counting up/filling in, see docs/research-planet4-comet-party.md)
 - [x] Planet 5: the Twin Planet (Tvillingplaneten) – the seesaw tips towards the heavier side when you share equally, the trampoline doubles the jump, the mirror pond shows double (see docs/research-planet5-10.md)
 - [x] Planet 6: the Friend Planet (Kompisplaneten) – pair up two piles to make the fox's number (number bonds) + the ten-friend bridge (ten-frame as a bridge)

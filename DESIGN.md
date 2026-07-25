@@ -54,6 +54,7 @@ player's **space station**, which grows and becomes more lively.
 - Dark space background with a **red rocket** and **yellow stars** (the player's wish!)
 - Warm red/yellow buttons and rewards, the planets in different colours
 - Large touch targets, more picture than text
+- Every planet fits the phone screen without horizontal scrolling
 
 ## Language & tone
 

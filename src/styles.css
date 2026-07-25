@@ -1359,6 +1359,7 @@ body.gpu-stars {
 /* The Monkey Planet: the Pixi scene (same frame as the old .jump-scene) */
 .jump-canvas {
   position: relative;
+  width: 100%;
   height: 320px;
   margin: 0.6rem 0 0.8rem;
   border-radius: 18px;
