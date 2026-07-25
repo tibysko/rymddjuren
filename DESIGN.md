@@ -61,7 +61,9 @@ player's **space station**, which grows and becomes more lively.
 
 - Very short, simple sentences: "Hur många?", "Mata apan!"
 - The tasks are always shown visually (animals/fruit to count), not just numerals
-- Speech synthesis (Swedish) reads everything aloud via the 🔊 button
+- Swedish speech synthesis reads the map, travel, results, station, feedback and
+  every level prompt aloud via a 🔊 button (the short travel message also starts
+  automatically)
 - Fixed Swedish lines can be exported with the OpenAI Speech API for future
   prerecorded audio; the generated files are not integrated into the game yet
 
@@ -77,4 +79,5 @@ player's **space station**, which grows and becomes more lively.
 - Stars per planet: completed = ⭐, few mistakes = ⭐⭐, almost all correct = ⭐⭐⭐
 - Planets can be replayed for more stars
 - The animal collection in the space station is the big reward
-- Progress is saved locally in the browser (localStorage)
+- Progress is saved locally in the browser (localStorage) and malformed saved
+  data is repaired safely

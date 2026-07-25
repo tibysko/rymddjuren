@@ -1,5 +1,6 @@
 import { useState, type CSSProperties } from 'react'
 import { LEVELS } from '../game/levels'
+import { speak } from '../game/speech'
 import type { Level, Progress } from '../game/types'
 import { sv } from '../i18n/sv'
 import Ugglis from './Ugglis'
@@ -25,6 +26,12 @@ export default function StarMap({ progress, onPlay, onStation }: Props) {
     return (stars[level.id - 1] || 0) > 0
   }
 
+  const mapSpeech = sv.map.spoken(
+    LEVELS.map((level) =>
+      sv.map.planetSpoken(level.name, level.desc, isUnlocked(level), stars[level.id] || 0),
+    ),
+  )
+
   return (
     <div className="starmap">
       <header className="starmap-header">
@@ -38,7 +45,10 @@ export default function StarMap({ progress, onPlay, onStation }: Props) {
       </header>
 
       <p className="ugglis-hello">
-        <Ugglis /> {sv.map.greeting}
+        <Ugglis /> {sv.map.greeting}{' '}
+        <button className="speak-btn" onClick={() => speak(mapSpeech)} aria-label={sv.map.speakLabel}>
+          🔊
+        </button>
       </p>
 
       <div className="planets">

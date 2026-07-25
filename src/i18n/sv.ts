@@ -38,6 +38,11 @@ export const sv = {
     title: '🚀 Rymddjuren',
     stationButton: '🛰️ Min rymdstation',
     greeting: 'Hej! Jag är Ugglis. Vilken planet ska vi flyga till?',
+    speakLabel: 'Läs upp',
+    planetSpoken: (name: string, desc: string, unlocked: boolean, stars: number) =>
+      unlocked ? `${name}. ${desc}. ${numberWord(stars)} stjärnor.` : `${name}. Låst.`,
+    spoken: (planets: string[]) =>
+      `Rymddjuren. Hej! Jag är Ugglis. Vilken planet ska vi flyga till? Min rymdstation. ${planets.join(' ')}`,
     locked: 'Låst',
     comingSoon: ' (kommer snart!)',
     buildButton: 'Version',
@@ -50,6 +55,8 @@ export const sv = {
   // ---- Travel screen ----
   travel: {
     heading: (planet: string) => `Mot ${planet}!`,
+    spoken: (planet: string) => `Nu flyger vi mot ${planet}!`,
+    speakLabel: 'Läs upp',
   },
 
   // ---- Space station (the animals you have collected) ----
@@ -58,6 +65,8 @@ export const sv = {
     empty: 'Här är det tomt än! Klara en planet så flyttar ett djur in.',
     back: '⬅️ Stjärnkartan',
     speakLabel: 'Läs upp',
+    spoken: (line: string, collected: number, total: number, hasAnimals: boolean) =>
+      `Min rymdstation. ${line} ${collected} av ${total} djur bor här.${hasAnimals ? ' Tryck på ett djur!' : ''}`,
     /** Under the station picture: "7 av 10 djur bor här" */
     counter: (collected: number, total: number) => `${collected} av ${total} djur bor här`,
     /** Ugglis greets you with a line that depends on how full the station is
@@ -91,6 +100,9 @@ export const sv = {
     heading: (planet: string) => `Du klarade ${planet}! 🎉`,
     newAnimal: (animalName: string) => `${animalName} flyttar in i din rymdstation!`,
     praise: 'Bra jobbat, rymdhjälte!',
+    spoken: (planet: string, animalName: string, newAnimal: boolean, stars: number) =>
+      `Du klarade ${planet}! Du fick ${numberWord(stars)} stjärnor.${newAnimal ? ` ${animalName} flyttar in i din rymdstation!` : ''} Bra jobbat, rymdhjälte!`,
+    speakLabel: 'Läs upp',
     back: 'Till stjärnkartan 🚀',
   },
 
@@ -103,6 +115,7 @@ export const sv = {
     cheers: ['Bra jobbat!', 'Superbra!', 'Wow, vad duktig du är!', 'Rätt! 🎉', 'Hurra!'],
     /** Ugglis offers a second chance – picked at random */
     tryAgain: ['Nästan! Prova igen!', 'Inte riktigt – du klarar det!', 'Försök en gång till!'],
+    feedbackSpeakLabel: 'Läs upp Ugglis svar',
   },
 
   // ---- Planets (name, animal and short description on the star map) ----

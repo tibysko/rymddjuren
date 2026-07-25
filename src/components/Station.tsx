@@ -86,7 +86,7 @@ export default function Station({ progress, onBack }: Props) {
         <h1>{sv.station.title}</h1>
         <button
           className="speak-btn"
-          onClick={() => speak(ugglisLine)}
+          onClick={() => speak(sv.station.spoken(ugglisLine, collected.length, total, collected.length > 0))}
           aria-label={sv.station.speakLabel}
         >
           🔊

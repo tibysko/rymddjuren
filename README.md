@@ -86,6 +86,8 @@ content for Years 1–3) and the Year 1 assessment support material for number s
 - [x] The space station is alive (`Station.tsx`): the animals float weightlessly and wiggle now and then, tapping one makes it bounce, burst into stars (`cheerBurst()`) and say its name out loud, the hull grows one lit module per animal above a "X av 10 djur bor här" counter, every card shows the stars earned on that planet framed in the planet's colour, Ugglis lives there with a 🔊 button and a line that follows the collection, the next animal is teased as a dark silhouette with a spoken riddle while the ones after it stay secret ❓, and a full station is greeted with a few seconds of golden rain
 - [x] Ugglis has an original red-and-gold astronaut illustration, generated as a game asset and reused consistently on the map, in answer feedback, on the results screen and in the space station
 - [x] The game tests itself (`npm test`, `tests/`): Playwright builds the production version, serves it and plays it in a phone-sized browser. A bot plays all ten planets from the first question to the results screen – it waits for each animation to finish, answers, and if Ugglis says "try again" it rules that answer out and picks another – while the tests watch for browser errors. On top of that come the rules of the space station and a screenshot of every screen. See [Tests](#tests).
+- [x] Safe progress recovery: malformed, incomplete or old local progress is repaired instead of blanking the game, and leaving a level cancels its pending callbacks.
+- [x] Read-aloud is available on the map, travel screen, result screen, space station and Ugglis feedback, as well as every level prompt.
 
 ## Tests
 

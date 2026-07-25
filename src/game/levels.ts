@@ -2,6 +2,7 @@
 // (see DESIGN.md). All player-facing text lives in src/i18n/sv.ts.
 
 import { sv } from '../i18n/sv'
+import { parseProgress, PROGRESS_STORAGE_KEY } from './progress'
 import type {
   BalanceQuestion,
   ChoiceQuestion,
@@ -532,14 +533,13 @@ function genLevel9(): Question[] {
 // stars come up more often. The data is already in localStorage.
 
 function genLevel10(): Question[] {
-  let stars: Record<number, number> = {}
+  let raw: string | null = null
   try {
-    // Same key as App.tsx (STORAGE_KEY)
-    const raw = localStorage.getItem('rymddjuren-progress')
-    if (raw) stars = (JSON.parse(raw) as { stars?: Record<number, number> }).stars ?? {}
+    raw = localStorage.getItem(PROGRESS_STORAGE_KEY)
   } catch {
     // No saved data – mix evenly
   }
+  const stars = parseProgress(raw, LEVELS.length).stars
   const pool: number[] = []
   for (const lvl of LEVELS) {
     if (lvl.id === 10 || !lvl.generate) continue

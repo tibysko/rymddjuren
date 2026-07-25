@@ -5,10 +5,10 @@ import LevelScreen from './components/LevelScreen'
 import ResultScreen from './components/ResultScreen'
 import Station from './components/Station'
 import { LEVELS } from './game/levels'
+import { normalizeProgress, parseProgress, PROGRESS_STORAGE_KEY } from './game/progress'
+import { speak } from './game/speech'
 import type { Level, Progress } from './game/types'
 import { sv } from './i18n/sv'
-
-const STORAGE_KEY = 'rymddjuren-progress'
 
 type Screen = 'map' | 'travel' | 'level' | 'result' | 'station'
 
@@ -19,13 +19,23 @@ interface LastResult {
 }
 
 function loadProgress(): Progress {
+  let raw: string | null = null
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return JSON.parse(raw) as Progress
+    raw = localStorage.getItem(PROGRESS_STORAGE_KEY)
   } catch {
-    // broken data – start over
+    return parseProgress(null, LEVELS.length)
   }
-  return { stars: {}, animals: [] }
+  const progress = parseProgress(raw, LEVELS.length)
+  // Repair bad or old saves immediately, so every part of the game sees the
+  // same safe shape (including Planet 10's adaptive question mix).
+  if (raw !== JSON.stringify(progress)) {
+    try {
+      localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(progress))
+    } catch {
+      // Private browsing may disallow storage; the in-memory game still works.
+    }
+  }
+  return progress
 }
 
 export default function App() {
@@ -40,9 +50,10 @@ export default function App() {
   const stationFull = (progress.animals?.length || 0) >= LEVELS.length
 
   function saveProgress(next: Progress) {
-    setProgress(next)
+    const safe = normalizeProgress(next, LEVELS.length)
+    setProgress(safe)
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+      localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(safe))
     } catch {
       // e.g. private mode – the game still works, it just does not save
     }
@@ -56,9 +67,10 @@ export default function App() {
   // The trip is short and asks nothing of the player – the level starts on its own
   useEffect(() => {
     if (screen !== 'travel') return
+    if (currentLevel) speak(sv.travel.spoken(currentLevel.name))
     const id = setTimeout(() => setScreen('level'), 1700)
     return () => clearTimeout(id)
-  }, [screen])
+  }, [screen, currentLevel])
 
   useEffect(() => {
     if (screen !== 'station' || !stationFull) {
@@ -106,6 +118,13 @@ export default function App() {
             {sv.travel.heading(currentLevel.name)}{' '}
             <span className="travel-animal">{currentLevel.animal}</span>
           </p>
+          <button
+            className="speak-btn"
+            onClick={() => speak(sv.travel.spoken(currentLevel.name))}
+            aria-label={sv.travel.speakLabel}
+          >
+            🔊
+          </button>
         </div>
       )}
       {screen === 'level' && currentLevel && (

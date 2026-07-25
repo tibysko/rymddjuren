@@ -36,6 +36,7 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
   const [rabbitPos, setRabbitPos] = useState<number | null>(null) // position in hop questions
   const [landedWrong, setLandedWrong] = useState(false) // the rabbit landed wrong
   const hopTimer = useRef<ReturnType<typeof setInterval> | undefined>(undefined)
+  const sessionTimeouts = useRef(new Set<ReturnType<typeof setTimeout>>())
   // The comet stairs (Comet Party): the rabbit's step + an "oops" shake on a wrong landing
   const [stairPos, setStairPos] = useState<number | null>(null)
   const [stairOops, setStairOops] = useState(false)
@@ -46,10 +47,29 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
 
   const q = questions[index]
 
+  function later(callback: () => void, ms: number) {
+    const id = setTimeout(() => {
+      sessionTimeouts.current.delete(id)
+      callback()
+    }, ms)
+    sessionTimeouts.current.add(id)
+  }
+
+  function clearSessionTimers() {
+    sessionTimeouts.current.forEach((id) => clearTimeout(id))
+    sessionTimeouts.current.clear()
+    clearInterval(hopTimer.current)
+    clearInterval(eatTimer.current)
+  }
+
+  function quitLevel() {
+    clearSessionTimers()
+    onQuit()
+  }
+
   useEffect(
     () => () => {
-      clearInterval(hopTimer.current)
-      clearInterval(eatTimer.current)
+      clearSessionTimers()
     },
     [],
   )
@@ -83,7 +103,7 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
     cheerBurst() // a star burst in the space behind – every correct answer is celebrated!
     setFeedback({ text: pick(sv.level.cheers), happy: true })
     setLocked(true)
-    setTimeout(() => {
+    later(() => {
       setFeedback(null)
       setWrongChoice(null)
       setFed([])
@@ -106,7 +126,7 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
     setWrongChoice(choice)
     setFeedback({ text: pick(sv.level.tryAgain), happy: false })
     setAttempted(true)
-    setTimeout(() => setFeedback(null), 1500)
+    later(() => setFeedback(null), 1500)
   }
 
   function answerChoice(choice: number) {
@@ -149,7 +169,7 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
             text: short ? sv.hop.tooShort(choice) : sv.hop.tooFar(choice),
             happy: false,
           })
-          setTimeout(() => {
+          later(() => {
             setFeedback(null)
             setLandedWrong(false)
             setRabbitPos(q.start)
@@ -197,7 +217,7 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
               : sv.stair.tooFar(choice, move, goal),
             happy: false,
           })
-          setTimeout(() => {
+          later(() => {
             setFeedback(null)
             setStairOops(false)
             setStairPos(q.start)
@@ -219,7 +239,7 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
   function sceneWrong(msg: string) {
     setAttempted(true)
     setFeedback({ text: msg, happy: false })
-    setTimeout(() => setFeedback(null), 2200)
+    later(() => setFeedback(null), 2200)
   }
 
   // The party table: a wrong answer → the eaten sweets are shown as pale ghosts,
@@ -233,7 +253,7 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
       setWrongChoice(choice)
       setAttempted(true)
       setFeedback({ text: sv.eat.countTheRest(q.total, q.eaten, q.answer), happy: false })
-      setTimeout(() => setFeedback(null), 2500)
+      later(() => setFeedback(null), 2500)
     }
   }
 
@@ -255,7 +275,7 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
   return (
     <div className="level" style={{ '--planet-color': level.color } as CSSProperties}>
       <header className="level-header">
-        <button className="quit-btn" onClick={onQuit} aria-label={sv.level.backToMap}>{sv.level.backToMap}</button>
+        <button className="quit-btn" onClick={quitLevel} aria-label={sv.level.backToMap}>{sv.level.backToMap}</button>
         <div className="progress-dots">
           {questions.map((_, i) =>
             level.id === 10 ? (
@@ -493,7 +513,14 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
 
       {feedback && (
         <div className={`ugglis-feedback ${feedback.happy ? 'happy' : 'oops'}`}>
-          <Ugglis /> {feedback.text}
+          <span role="status"><Ugglis /> {feedback.text}</span>
+          <button
+            className="speak-btn feedback-speak-btn"
+            onClick={() => speak(feedback.text)}
+            aria-label={sv.level.feedbackSpeakLabel}
+          >
+            🔊
+          </button>
         </div>
       )}
     </div>

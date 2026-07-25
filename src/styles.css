@@ -112,6 +112,11 @@ h1 {
   margin-bottom: 1rem;
 }
 
+.ugglis-hello .speak-btn {
+  margin-left: 0.35rem;
+  vertical-align: middle;
+}
+
 .planets {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -1179,6 +1184,14 @@ h1 {
   color: #333;
 }
 
+.feedback-speak-btn {
+  width: 2.35rem;
+  height: 2.35rem;
+  margin-left: 0.45rem;
+  font-size: 1rem;
+  vertical-align: middle;
+}
+
 @keyframes pop {
   from { transform: translateX(-50%) scale(0.6); opacity: 0; }
   to { transform: translateX(-50%) scale(1); opacity: 1; }
@@ -1194,6 +1207,17 @@ h1 {
   gap: 1.4rem;
   padding-top: 3rem;
   text-align: center;
+}
+
+.result-heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.result-heading h1 {
+  margin: 0;
 }
 
 .result-stars {

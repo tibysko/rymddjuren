@@ -34,7 +34,8 @@ types.ts  ── defines Level, Question and Progress
 
 | Path | Responsibility |
 |---|---|
-| `src/App.tsx` | The app's screen state, selected planet, results and `localStorage`. |
+| `src/App.tsx` | The app's screen state, selected planet, results and safe progress loading. |
+| `src/game/progress.ts` | Normalises and repairs local progress before the app uses it. |
 | `src/game/types.ts` | Contracts for all question types, planets and progress. |
 | `src/game/levels.ts` | Random generators, the planet collection and star thresholds. |
 | `src/components/LevelScreen.tsx` | Runs ten questions, handles the first attempt, Ugglis feedback and simple scenes. |
@@ -69,6 +70,10 @@ interface Progress {
   animals: number[]             // planet ids for collected animals
 }
 ```
+
+`parseProgress()` accepts missing or partly valid older saves, removes duplicate
+or out-of-range animals, clamps stars to 0–3 and repairs the stored value. A
+bad save must always open the star map with a usable empty progress object.
 
 A replay can improve the star count but never lower it. The first
 completion adds the planet's animal. If storage is missing, full or

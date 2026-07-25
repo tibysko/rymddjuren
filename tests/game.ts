@@ -46,6 +46,10 @@ export interface Game {
   planet: (id: number) => Promise<void>
   /** Answer every question of the level. Returns true if it reached the end. */
   play: (budget?: number) => Promise<boolean>
+  /** Stop with the tenth question ready, before answering it. */
+  playUntilLast: () => Promise<void>
+  /** Solve the question currently on screen, stopping as soon as it is judged right. */
+  solveCurrent: () => Promise<boolean>
   /** Everything the browser logged as an error */
   errors: string[]
 }
@@ -164,6 +168,14 @@ export const test = base.extend<{ game: Game }>({
       async play(budget = 120) {
         return playLevel(page, budget)
       },
+
+      async playUntilLast() {
+        await playLevel(page, 120, 10)
+      },
+
+      async solveCurrent() {
+        return solveCurrentQuestion(page)
+      },
     }
 
     await use(game)
@@ -196,6 +208,7 @@ interface Spy {
 /** What the bot sees when it looks at the screen */
 interface Snapshot {
   done: boolean
+  question: number
   /** Changes when the question changes – the bot's cue to forget old answers */
   sig: string
   kind: 'choice' | 'feed' | 'share' | 'pair' | 'none'
@@ -262,6 +275,7 @@ async function look(page: Page): Promise<Snapshot> {
     if (document.querySelector('.result')) {
       return {
         done: true,
+        question: 0,
         sig: 'result',
         kind: 'none',
         choices: 0,
@@ -292,6 +306,7 @@ async function look(page: Page): Promise<Snapshot> {
 
     return {
       done: false,
+      question: Number(text('.level-count').split('/')[0]) || 0,
       // The question number, the question itself, the buttons offered and the
       // giant planet's phase hint – anything that changes means a new question.
       sig: [
@@ -390,7 +405,7 @@ function firstAllowed(count: number, ruledOut: Set<string>, prefix: string): num
  * landed mid-animation) do not count against it – only the loop guard, which is
  * there so a game that stops responding fails instead of spinning forever.
  */
-async function playLevel(page: Page, budget: number): Promise<boolean> {
+async function playLevel(page: Page, budget: number, stopAtQuestion?: number): Promise<boolean> {
   let sig = ''
   let ruledOut = new Set<string>()
   let judged = 0
@@ -399,6 +414,7 @@ async function playLevel(page: Page, budget: number): Promise<boolean> {
     await waitUntilStill(page).catch(() => {}) // a stuck animation must not hide a bug
     const s = await look(page)
     if (s.done) return true
+    if (stopAtQuestion !== undefined && s.question >= stopAtQuestion) return false
 
     // A new question – nothing to remember from the previous one
     if (s.sig !== sig) {
@@ -421,4 +437,20 @@ async function playLevel(page: Page, budget: number): Promise<boolean> {
   }
 
   return (await page.locator('.result').count()) > 0
+}
+
+/** Answer the current question by elimination, without waiting for the next one. */
+async function solveCurrentQuestion(page: Page, budget = 8): Promise<boolean> {
+  const ruledOut = new Set<string>()
+  for (let i = 0; i < budget; i++) {
+    await waitUntilStill(page)
+    const s = await look(page)
+    if (s.done) return true
+    const given = await answer(page, s, ruledOut)
+    if (!given) return false
+    const verdict = await verdictOf(page, s.said)
+    if (verdict === 'happy') return true
+    if (verdict === 'oops') ruledOut.add(given)
+  }
+  return false
 }
