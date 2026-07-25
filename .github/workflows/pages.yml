@@ -1,6 +1,7 @@
 # Publicerar spelet på GitHub Pages.
 # Körs automatiskt vid varje push till main:
-# bygger spela.html (allt i en fil) och lägger upp den som index.html.
+# bygger spela.html (allt i en fil) och lägger upp den som index.html,
+# tillsammans med app-ikoner, manifest och service worker (offline-stöd).
 name: Publicera på GitHub Pages
 
 on:
@@ -37,8 +38,11 @@ jobs:
       - name: Bygg enfilsversionen (spela.html)
         run: npm run build:single
 
-      - name: Gör spela.html till startsida
-        run: mkdir -p _site && cp spela.html _site/index.html
+      - name: Lägg ihop sajten
+        run: |
+          mkdir -p _site
+          cp spela.html _site/index.html
+          cp public/manifest.webmanifest public/sw.js public/ikon-*.png _site/
 
       - name: Aktivera GitHub Pages
         uses: actions/configure-pages@v5
