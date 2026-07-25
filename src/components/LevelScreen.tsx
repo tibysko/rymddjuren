@@ -232,7 +232,7 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
     } else {
       setWrongChoice(choice)
       setAttempted(true)
-      setFeedback({ text: sv.eat.countTheRest, happy: false })
+      setFeedback({ text: sv.eat.countTheRest(q.total, q.eaten, q.answer), happy: false })
       setTimeout(() => setFeedback(null), 2500)
     }
   }
@@ -255,7 +255,7 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
   return (
     <div className="level" style={{ '--planet-color': level.color } as CSSProperties}>
       <header className="level-header">
-        <button className="quit-btn" onClick={onQuit}>⬅️</button>
+        <button className="quit-btn" onClick={onQuit} aria-label={sv.level.backToMap}>{sv.level.backToMap}</button>
         <div className="progress-dots">
           {questions.map((_, i) =>
             level.id === 10 ? (
@@ -321,6 +321,7 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
                 key={c}
                 className={`choice-btn ${wrongChoice === c ? 'wrong' : ''}`}
                 onClick={() => answerChoice(c)}
+                disabled={locked}
               >
                 {c}
               </button>
@@ -351,6 +352,7 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
                 key={c}
                 className={`choice-btn ${wrongChoice === c ? 'wrong' : ''}`}
                 onClick={() => answerHop(c)}
+                disabled={locked}
               >
                 {c}
               </button>
@@ -399,6 +401,7 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
                 key={c}
                 className={`choice-btn ${wrongChoice === c ? 'wrong' : ''}`}
                 onClick={() => answerStair(c)}
+                disabled={locked}
               >
                 {c}
               </button>
@@ -409,13 +412,13 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
 
       {q.type === 'eat' && (
         <>
-          <div className="party-scene">
+          <div className="party-scene" aria-live="polite">
             <span className={`party-parrot ${eating ? 'munching' : ''}`}>🦜</span>
             <div className="party-table">
               {Array.from({ length: q.total }).map((_, i) => {
                 const isEaten = i >= q.total - eatenSoFar
                 return (
-                  <span key={i} className={`candy ${isEaten ? (attempted ? 'ghost' : 'gone') : ''}`}>
+                  <span key={i} className={`candy ${isEaten ? 'ghost' : ''}`}>
                     {q.item}
                   </span>
                 )
@@ -423,12 +426,20 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
             </div>
             <span className="party-table-leg" />
           </div>
+          {!eating && (
+            <div className="eat-story">
+              <span>{sv.eat.start(q.total)}</span>
+              <span>{sv.eat.eaten(q.eaten)}</span>
+              <span className="eat-left">{sv.eat.left(q.answer)}</span>
+            </div>
+          )}
           <div className={`choices ${eating ? 'waiting' : ''}`}>
             {q.choices.map((c) => (
               <button
                 key={c}
                 className={`choice-btn ${wrongChoice === c ? 'wrong' : ''}`}
                 onClick={() => answerEat(c)}
+                disabled={locked || eating}
               >
                 {c}
               </button>
@@ -449,12 +460,13 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
                 key={i}
                 className={`feed-item ${fed.includes(i) ? 'fed' : ''}`}
                 onClick={() => toggleFeed(i)}
+                disabled={locked}
               >
                 {q.item}
               </button>
             ))}
           </div>
-          <button className="big-btn check-btn" onClick={checkFeed}>
+          <button className="big-btn check-btn" onClick={checkFeed} disabled={locked}>
             {sv.level.check}
           </button>
         </>

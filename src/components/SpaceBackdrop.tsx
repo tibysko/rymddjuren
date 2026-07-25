@@ -168,7 +168,8 @@ export default function SpaceBackdrop({ mode }: { mode: BackdropMode }) {
         })
       }
 
-      // Comet: sails slowly past with a glittering tail
+      // Comet: the emoji already has a tail pointing down-right, so it sails
+      // up-left. Extra particle dots made that tail look disconnected.
       function spawnComet(w: number, h: number) {
         const c = new Text({ text: '☄️', style: { fontSize: 30 + Math.random() * 14 } })
         c.anchor.set(0.5)
@@ -177,7 +178,7 @@ export default function SpaceBackdrop({ mode }: { mode: BackdropMode }) {
         c.alpha = 0.85
         addPart(c, {
           vx: -(50 + Math.random() * 40),
-          vy: 14 + Math.random() * 12,
+          vy: -(14 + Math.random() * 12),
           vr: 0,
           life: 30,
           maxLife: 30,
@@ -254,13 +255,14 @@ export default function SpaceBackdrop({ mode }: { mode: BackdropMode }) {
           p.g.x += p.vx * dt
           p.g.y += p.vy * dt
           p.g.rotation += p.vr * dt
-          // Shooting stars and comets leave a glitter trail behind them
+          // Shooting stars leave a glitter trail behind them. The comet emoji
+          // carries its own continuous tail.
           const isComet = p.g instanceof Text
-          if (p.grav === 0 && (Math.abs(p.vx) > 220 || isComet) && Math.random() < (isComet ? 0.45 : 0.75)) {
-            const t = new Graphics().circle(0, 0, isComet ? 1.9 : 1.6).fill(isComet || p.vx < 0 ? GOLD : WHITE)
-            t.x = p.g.x + (isComet ? 12 : 0)
-            t.y = p.g.y + (isComet ? 6 : 0)
-            addPart(t, { vx: 0, vy: 8, vr: 0, life: isComet ? 0.8 : 0.4, maxLife: isComet ? 0.8 : 0.4, grav: 0 })
+          if (p.grav === 0 && Math.abs(p.vx) > 220 && !isComet && Math.random() < 0.75) {
+            const t = new Graphics().circle(0, 0, 1.6).fill(p.vx < 0 ? GOLD : WHITE)
+            t.x = p.g.x
+            t.y = p.g.y
+            addPart(t, { vx: 0, vy: 8, vr: 0, life: 0.4, maxLife: 0.4, grav: 0 })
           }
           // Fade out towards the end of the lifetime
           if (p.maxLife <= 2) p.g.alpha = Math.min(1, p.life / (p.maxLife * 0.5))

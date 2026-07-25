@@ -51,7 +51,7 @@ export const sv = {
   station: {
     title: '🛰️ Min rymdstation',
     empty: 'Här är det tomt än! Klara en planet så flyttar ett djur in.',
-    back: '⬅️ Tillbaka',
+    back: '⬅️ Stjärnkartan',
     speakLabel: 'Läs upp',
     /** Under the station picture: "7 av 10 djur bor här" */
     counter: (collected: number, total: number) => `${collected} av ${total} djur bor här`,
@@ -92,6 +92,7 @@ export const sv = {
   // ---- Level screen: shared chrome and feedback ----
   level: {
     speakLabel: 'Läs upp',
+    backToMap: '⬅️ Stjärnkartan',
     check: 'Klart! ✅',
     /** Ugglis cheers on a correct answer – picked at random */
     cheers: ['Bra jobbat!', 'Superbra!', 'Wow, vad duktig du är!', 'Rätt! 🎉', 'Hurra!'],
@@ -173,7 +174,11 @@ export const sv = {
     prompt: 'Hur många är kvar?',
     spoken: (total: number, eaten: number) =>
       `Det låg ${total} godisar på kalasbordet. Papegojan åt upp ${eaten}! Hur många godisar är kvar?`,
-    countTheRest: 'Titta! De bleka är uppätna. Räkna dem som är kvar!',
+    start: (total: number) => `Först: ${total}`,
+    eaten: (eaten: number) => `Åt upp: ${eaten}`,
+    left: (left: number) => `Kvar: ${left}`,
+    countTheRest: (total: number, eaten: number, left: number) =>
+      `Först var det ${total}. Papegojan åt ${eaten}. Då är ${left} kvar.`,
   },
 
   // ---- Planet 5: sharing, the trampoline and the mirror pond ----
@@ -185,12 +190,14 @@ export const sv = {
     tilting: (left: number, right: number) =>
       `Gungbrädan tippar! ${left} och ${right} är inte lika.`,
     allShared: 'Allt utdelat!',
-    help: 'Tryck på en panda. Då får den en pinne!',
+    source: 'Bambu att dela',
+    help: 'Tryck på en panda. Den får en pinne!',
     giveLeftLabel: 'Ge vänster panda en pinne',
     giveRightLabel: 'Ge höger panda en pinne',
     giveLabel: 'Ge en pinne',
     takeBackLeftLabel: 'Ta tillbaka från vänster',
     takeBackRightLabel: 'Ta tillbaka från höger',
+    undoLabel: 'Ta tillbaka',
   },
   double: {
     prompt: (target: number) =>

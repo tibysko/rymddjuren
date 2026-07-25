@@ -11,7 +11,7 @@ interface Props {
 
 export default function ResultScreen({ level, stars, newAnimal, onBack }: Props) {
   return (
-    <div className="result">
+    <div className="result result-panel">
       <h1>{sv.result.heading(level.name)}</h1>
       <div className="result-stars">
         {[1, 2, 3].map((s) => (
