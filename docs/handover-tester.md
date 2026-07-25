@@ -109,6 +109,18 @@ aloud, `prefers-reduced-motion` respected, no new dependencies without asking,
 and never touch `_to_delete/`, `dist/` or `dist-single/`. If a test is awkward to
 write, change the test, not the game.
 
+## Done
+
+This handover has been carried out: `npm test` is green (33 tests, about five
+minutes), the baselines are committed, and README.md has a `## Tests` section.
+What actually broke, and what had to change, is in the commit message for
+"Test the game automatically with Playwright, and fix a Pixi teardown crash".
+
+Two things the suite found were deliberately NOT fixed, because both are Ola's
+call: see **`docs/handover-jump-canvas-and-first-burst.md`** (the Monkey Planet
+scrolls sideways on a phone; the first star burst stalls the browser for about a
+second). Neither one fails the suite.
+
 ## When done
 
 - `npm test` green, baselines committed.
