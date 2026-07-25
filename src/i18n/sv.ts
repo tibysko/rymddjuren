@@ -40,6 +40,11 @@ export const sv = {
     greeting: 'Hej! Jag är Ugglis. Vilken planet ska vi flyga till?',
     locked: 'Låst',
     comingSoon: ' (kommer snart!)',
+    buildButton: 'Version',
+    buildHeading: 'Version på den här mobilen',
+    buildVersion: (id: string) => `Version ${id}`,
+    buildLocal: 'lokal',
+    buildClose: 'Stäng',
   },
 
   // ---- Travel screen ----

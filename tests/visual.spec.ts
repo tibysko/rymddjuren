@@ -40,6 +40,14 @@ test('stjärnkartan', async ({ game }) => {
   await expect(game.page).toHaveScreenshot('stjarnkarta.png', SHOT)
 })
 
+test('versionsstämpeln visar vilken build som körs', async ({ game }) => {
+  await game.start(HALF)
+  const button = game.page.getByRole('button', { name: 'Version' })
+  await expect(button).toBeVisible()
+  await button.click()
+  await expect(game.page.getByRole('dialog')).toContainText('Version')
+})
+
 test('stationen är tom', async ({ game }) => {
   await open(game, EMPTY)
   await game.station()
