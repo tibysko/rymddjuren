@@ -1,16 +1,16 @@
-// Delad PixiJS-hjälpare. Pixi v8 väljer WebGPU där det finns och faller
-// automatiskt tillbaka till WebGL annars. Om ingen av dem fungerar (mycket
-// gammal webbläsare) returnerar vi null – spelet fungerar då precis som förut,
-// canvas-lagren är ren glasyr.
+// Shared PixiJS helper. Pixi v8 picks WebGPU where it exists and falls back
+// to WebGL automatically otherwise. If neither works (very old browser) we
+// return null – the game then works exactly as before, the canvas layers are
+// pure icing.
 
 import { Application, Container, Graphics, Text } from 'pixi.js'
 import type { ApplicationOptions } from 'pixi.js'
 
 let loggedRenderer = false
 
-// Om WebGPU visar sig trasigt minns vi det – i sessionen OCH i localStorage,
-// så att spelet startar direkt på WebGL nästa gång. Går att styra för hand
-// med ?renderer=webgl eller ?renderer=webgpu i adressraden.
+// If WebGPU turns out to be broken we remember it – for the session AND in
+// localStorage, so the game starts straight on WebGL next time. Can be forced
+// by hand with ?renderer=webgl or ?renderer=webgpu in the address bar.
 const RENDERER_KEY = 'rymddjuren-renderer'
 
 function rendererOverride(): 'webgl' | 'webgpu' | null {
@@ -26,7 +26,7 @@ let webgpuBroken = (() => {
   const forced = rendererOverride()
   if (forced === 'webgpu') {
     try {
-      localStorage.removeItem(RENDERER_KEY) // ge WebGPU en ny chans
+      localStorage.removeItem(RENDERER_KEY) // give WebGPU another chance
     } catch {
       /* ok */
     }
@@ -40,8 +40,8 @@ let webgpuBroken = (() => {
   }
 })()
 
-// Lyssnare som vill veta när vi ger upp WebGPU mitt i en session
-// (t.ex. bakgrunden, som lever länge och behöver starta om sig på WebGL)
+// Listeners that want to know when we give up on WebGPU mid-session
+// (e.g. the backdrop, which is long-lived and needs to restart on WebGL)
 type FallbackCb = () => void
 const fallbackCbs = new Set<FallbackCb>()
 
@@ -60,15 +60,15 @@ function markWebgpuBroken(notify = false) {
     /* ok */
   }
   if (notify) {
-    webgpuActive = false // larma bara en gång
+    webgpuActive = false // only raise the alarm once
     fallbackCbs.forEach((cb) => cb())
   }
 }
 
-// Vissa WebGPU-fel dyker upp först mitt under en senare rendering och går
-// inte att fånga vid init. Vakten: första okontrollerade GPU-felet →
-// WebGL från och med nästa scen (scenerna monteras om per fråga, så spelet
-// läker sig självt inom en fråga – och helt vid nästa start).
+// Some WebGPU errors only show up in the middle of a later render and cannot
+// be caught at init. The guard: the first uncaught GPU error → WebGL from the
+// next scene onwards (scenes remount per question, so the game heals itself
+// within a question – and completely on the next start).
 let webgpuActive = false
 if (typeof window !== 'undefined') {
   window.addEventListener('error', (e) => {
@@ -92,12 +92,12 @@ async function tryInit(
     autoDensity: true,
     ...options,
   })
-  // Kanariefågeln: rendera EN provbild innan vi litar på renderaren.
-  // Vissa WebGPU-miljöer klarar init men kraschar först vid riktig rendering
-  // (texturuppladdning eller buffertar) – då vill vi upptäcka det direkt och
-  // byta till WebGL, inte lämna barnet med en tom bana. Provet härmar därför
-  // spelets verkliga last: stora emoji-texter + lika mycket geometri som
-  // stjärnfältet. (Canvasen sitter inte i DOM än, så inget syns.)
+  // The canary: render ONE probe frame before we trust the renderer.
+  // Some WebGPU environments survive init but crash on the first real render
+  // (texture upload or buffers) – we want to catch that right away and switch
+  // to WebGL rather than leaving the child with an empty level. The probe
+  // therefore mimics the game's real load: large emoji text + as much geometry
+  // as the starfield. (The canvas is not in the DOM yet, so nothing shows.)
   try {
     const probe = new Container()
     probe.addChild(new Text({ text: '🐰🍌🐵', style: { fontSize: 48 } }))
@@ -122,7 +122,7 @@ export async function createPixiApp(
   let app: Application | null = null
   if (!webgpuBroken) {
     try {
-      // 'webgpu' = WebGPU där det finns; Pixi väljer själv WebGL annars
+      // 'webgpu' = WebGPU where available; Pixi picks WebGL on its own otherwise
       app = await tryInit('webgpu', options)
       if (app.renderer.type === 2) webgpuActive = true
     } catch {
@@ -138,8 +138,8 @@ export async function createPixiApp(
   }
   if (!loggedRenderer) {
     loggedRenderer = true
-    // 1 = WebGL, 2 = WebGPU (RendererType i Pixi v8)
-    console.info(`Rymddjuren: ritar med ${app.renderer.type === 2 ? 'WebGPU ✨' : 'WebGL'}`)
+    // 1 = WebGL, 2 = WebGPU (RendererType in Pixi v8)
+    console.info(`Rymddjuren: drawing with ${app.renderer.type === 2 ? 'WebGPU ✨' : 'WebGL'}`)
   }
   return app
 }

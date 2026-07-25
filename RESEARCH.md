@@ -1,39 +1,39 @@
-# Research: liknande mattespel & designlärdomar
+# Research: similar math games & design lessons
 
-Underlag inför designen av vårt spel. Baserat på svenska mattespel
-(Zcooly, HejAlbert, King of Math Junior), DragonBox Numbers och
-UX-forskning om spel för barn 6–8 år.
+Background material for the design of our game. Based on Swedish math games
+(Zcooly, HejAlbert, King of Math Junior), DragonBox Numbers and
+UX research on games for children aged 6–8.
 
-## Vad de bästa spelen gör
+## What the best games do
 
-### Zcooly / HejAlbert (svenska, följer läroplanen)
-- Äventyrsvärld med **avatar/personalisering** – skapar ägandekänsla
-- Många **korta minispel** ordnade från lätt till svårt
-- Ljusa färger, inbjudande illustrationer, enkel navigation
-- Tydliga korta instruktioner; föräldern kan följa framsteg
+### Zcooly / HejAlbert (Swedish, follows the curriculum)
+- Adventure world with **avatar/personalisation** – creates a sense of ownership
+- Many **short mini-games** ordered from easy to hard
+- Bright colours, inviting illustrations, simple navigation
+- Clear short instructions; the parent can follow progress
 
-### DragonBox Numbers (prisbelönt, 4–8 år)
-- Tal visas **visuellt och manipulerbart** (staplar/block i olika höjd),
-  inte bara som siffror – bygger taluppfattning före symboler
-- **Minimal text** – barnet lär sig genom att göra, inte läsa regler
-- Samma begrepp tränas i **flera olika spellägen** (pussel, stegar, plattform)
-- Svårigheten ökar gradvis mot tals uppdelning (talkamrater!)
+### DragonBox Numbers (award-winning, ages 4–8)
+- Numbers are shown **visually and manipulable** (bars/blocks of different heights),
+  not just as digits – builds number sense before symbols
+- **Minimal text** – the child learns by doing, not by reading rules
+- The same concept is practised in **several different game modes** (puzzle, stairs, platformer)
+- Difficulty ramps up gradually towards decomposing numbers (number bonds!)
 
-### UX-forskning för barn 6–8
-- **En sak per skärm** – många val samtidigt ger beslutsångest (Hicks lag)
-- **Snabbt in i spelet** – från start till spelande inom ~15 sekunder
-- **Maskot/figur ger feedback** – en älskad karaktär bär engagemanget,
-  inte konfetti och glitter överallt
-- Svårighet i "lagom-zonen" – precis utmanande nog, aldrig frustrerande
-- Matten ska **vara spelet**, inte ett läxförhör med dekor runtom
-- Stora tryckytor – finmotoriken är inte färdigutvecklad
+### UX research for children aged 6–8
+- **One thing per screen** – many choices at once cause decision anxiety (Hick's law)
+- **Fast into the game** – from launch to playing within ~15 seconds
+- **A mascot/character gives feedback** – a beloved character carries the engagement,
+  not confetti and glitter everywhere
+- Difficulty in the "just right" zone – challenging enough, never frustrating
+- The math should **be the game**, not a homework quiz with decoration around it
+- Large tap targets – fine motor skills are not fully developed
 
-## Vad vi tar med oss till vårt spel
+## What we take with us into our game
 
-1. Bankarta i äventyrsvärld, en maskot som hejar på och ger feedback
-2. **En uppgift i taget**, stora knappar, minimal text + 🔊-uppläsning
-3. Tidiga banor visar antal **visuellt** (föremål/prickar) kopplat till siffran
-4. Alltid belöning vid avklarad bana (minst 1 stjärna) – aldrig "underkänd"
-5. Fel svar = andra chans + mild hjälp, inte rött kryss och pling
-6. Ett klick från start till första uppgiften
-7. Samma moment kan återkomma i olika spelformer så det inte blir enformigt
+1. Level map in an adventure world, a mascot that cheers you on and gives feedback
+2. **One task at a time**, big buttons, minimal text + 🔊 read-aloud
+3. Early levels show quantity **visually** (objects/dots) tied to the digit
+4. Always a reward for completing a level (at least 1 star) – never "failed"
+5. Wrong answer = second chance + gentle help, not a red cross and a buzz
+6. One click from launch to the first task
+7. The same content can come back in different game forms so it doesn't get monotonous

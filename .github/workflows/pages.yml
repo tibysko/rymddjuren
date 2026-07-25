@@ -1,8 +1,8 @@
-# Publicerar spelet på GitHub Pages.
-# Körs automatiskt vid varje push till main:
-# bygger spela.html (allt i en fil) och lägger upp den som index.html,
-# tillsammans med app-ikoner, manifest och service worker (offline-stöd).
-name: Publicera på GitHub Pages
+# Publishes the game to GitHub Pages.
+# Runs automatically on every push to main: builds play.html (everything in a
+# single file) and uploads it as index.html, together with the app icons, the
+# manifest and the service worker (offline support).
+name: Publish to GitHub Pages
 
 on:
   push:
@@ -32,19 +32,19 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Installera beroenden
+      - name: Install dependencies
         run: npm ci
 
-      - name: Bygg enfilsversionen (spela.html)
+      - name: Build the single-file version (play.html)
         run: npm run build:single
 
-      - name: Lägg ihop sajten
+      - name: Assemble the site
         run: |
           mkdir -p _site
-          cp spela.html _site/index.html
-          cp public/manifest.webmanifest public/sw.js public/ikon-*.png _site/
+          cp play.html _site/index.html
+          cp public/manifest.webmanifest public/sw.js public/icon-*.png _site/
 
-      - name: Aktivera GitHub Pages
+      - name: Enable GitHub Pages
         uses: actions/configure-pages@v5
         with:
           enablement: true
@@ -53,6 +53,6 @@ jobs:
         with:
           path: _site
 
-      - name: Publicera
+      - name: Publish
         id: deployment
         uses: actions/deploy-pages@v4

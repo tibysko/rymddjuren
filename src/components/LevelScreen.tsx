@@ -4,13 +4,11 @@ import { cheerBurst } from '../game/fx'
 import { QUESTIONS_PER_LEVEL, starsFor } from '../game/levels'
 import { speak } from '../game/speech'
 import type { Level } from '../game/types'
+import { sv } from '../i18n/sv'
 import { BalanceScene, DoubleScene, PairScene, PatternScene, ShareScene, Via10Scene } from './scenes'
 import JumpScene from './JumpScene'
 
-const CHEERS = ['Bra jobbat!', 'Superbra!', 'Wow, vad duktig du är!', 'Rätt! 🎉', 'Hurra!']
-const TRY_AGAIN = ['Nästan! Prova igen!', 'Inte riktigt – du klarar det!', 'Försök en gång till!']
-
-function pick(arr: string[]): string {
+function pick(arr: readonly string[]): string {
   return arr[Math.floor(Math.random() * arr.length)]
 }
 
@@ -29,18 +27,18 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
   const questions = useMemo(() => level.generate!(), [level])
   const [index, setIndex] = useState(0)
   const [firstTryCorrect, setFirstTryCorrect] = useState(0)
-  const [attempted, setAttempted] = useState(false) // fel på första försöket?
+  const [attempted, setAttempted] = useState(false) // wrong on the first try?
   const [feedback, setFeedback] = useState<Feedback | null>(null)
   const [wrongChoice, setWrongChoice] = useState<number | null>(null)
-  const [fed, setFed] = useState<number[]>([]) // matade index i feed-frågor
+  const [fed, setFed] = useState<number[]>([]) // fed indices in feed questions
   const [locked, setLocked] = useState(false)
-  const [rabbitPos, setRabbitPos] = useState<number | null>(null) // position i hopp-frågor
-  const [landedWrong, setLandedWrong] = useState(false) // kaninen landade fel
+  const [rabbitPos, setRabbitPos] = useState<number | null>(null) // position in hop questions
+  const [landedWrong, setLandedWrong] = useState(false) // the rabbit landed wrong
   const hopTimer = useRef<ReturnType<typeof setInterval> | undefined>(undefined)
-  // Komettrappan (Kometkalaset): kaninens trappsteg + "oj!"-skak vid fel landning
+  // The comet stairs (Comet Party): the rabbit's step + an "oops" shake on a wrong landing
   const [stairPos, setStairPos] = useState<number | null>(null)
   const [stairOops, setStairOops] = useState(false)
-  // Kalasbordet: hur många godisar papegojan ätit hittills (animeras synligt)
+  // The party table: how many sweets the parrot has eaten so far (visibly animated)
   const [eatenSoFar, setEatenSoFar] = useState(0)
   const [eating, setEating] = useState(false)
   const eatTimer = useRef<ReturnType<typeof setInterval> | undefined>(undefined)
@@ -55,8 +53,9 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
     [],
   )
 
-  // Kalasbordet: när en ät-fråga visas äter papegojan upp godisarna en i taget,
-  // synligt, INNAN barnet svarar – "ta bort" blir en händelse, inte en siffra.
+  // The party table: when an eat question appears the parrot eats the sweets one
+  // at a time, visibly, BEFORE the child answers – "take away" becomes an event
+  // rather than a digit.
   useEffect(() => {
     if (q.type !== 'eat') return
     setEatenSoFar(0)
@@ -80,8 +79,8 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
 
   function nextQuestion(wasFirstTry: boolean) {
     if (wasFirstTry) setFirstTryCorrect((n) => n + 1)
-    cheerBurst() // stjärnexplosion i rymden bakom – varje rätt svar firas!
-    setFeedback({ text: pick(CHEERS), happy: true })
+    cheerBurst() // a star burst in the space behind – every correct answer is celebrated!
+    setFeedback({ text: pick(sv.level.cheers), happy: true })
     setLocked(true)
     setTimeout(() => {
       setFeedback(null)
@@ -104,7 +103,7 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
 
   function wrongAnswer(choice: number | null) {
     setWrongChoice(choice)
-    setFeedback({ text: pick(TRY_AGAIN), happy: false })
+    setFeedback({ text: pick(sv.level.tryAgain), happy: false })
     setAttempted(true)
     setTimeout(() => setFeedback(null), 1500)
   }
@@ -119,9 +118,9 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
     }
   }
 
-  // Hopp-frågor: kaninen hoppar ALLTID exakt så många hopp som barnet väljer.
-  // Rätt svar → landar på stjärnan. Fel svar → landar synligt fel på tallinjen,
-  // så barnet ser varför t.ex. 3 hopp inte räcker fram till stjärnan.
+  // Hop questions: the rabbit ALWAYS hops exactly as many times as the child
+  // picks. Right answer → it lands on the star. Wrong answer → it lands visibly
+  // wrong on the number line, so the child sees why e.g. 3 hops fall short.
   function answerHop(choice: number) {
     if (locked) return
     if (q.type !== 'hop') return
@@ -140,15 +139,13 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
           setLocked(false)
           nextQuestion(wasFirstTry)
         } else {
-          // Landade fel – låt det synas en stund, hoppa sen tillbaka till start
+          // Landed wrong – let it show for a moment, then hop back to the start
           setLandedWrong(true)
           setWrongChoice(choice)
           setAttempted(true)
           const short = (dir === 1 ? landing < q.target : landing > q.target)
           setFeedback({
-            text: short
-              ? `Oj! ${choice} hopp räckte inte fram. Prova igen!`
-              : `Oj! ${choice} hopp var för långt. Prova igen!`,
+            text: short ? sv.hop.tooShort(choice) : sv.hop.tooFar(choice),
             happy: false,
           })
           setTimeout(() => {
@@ -163,40 +160,40 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
     }, 380)
   }
 
-  // Komettrappan: kaninen studsar ALLTID exakt så många steg som barnet väljer,
-  // ett steg i taget, och Ugglis räknar varje tal högt ("åtta… sju… sex!").
-  // Fel svar → kaninen stannar synligt på fel trappsteg. Trappan slutar vid 0,
-  // så det GÅR inte att ta bort mer än man har.
+  // The comet stairs: the rabbit ALWAYS bounces exactly as many steps as the
+  // child picks, one step at a time, and Ugglis counts each number out loud
+  // ("eight… seven… six!"). Wrong answer → the rabbit visibly stops on the wrong
+  // step. The stairs end at 0, so you CANNOT take away more than you have.
   function answerStair(choice: number) {
     if (locked) return
     if (q.type !== 'stair') return
     setLocked(true)
     setStairOops(false)
     const wasFirstTry = !attempted
-    const dir = q.dir === 'ner' ? -1 : 1
+    const dir = q.dir === 'down' ? -1 : 1
     const landing = q.start + dir * choice
     let pos = q.start
     hopTimer.current = setInterval(() => {
       pos += dir
       setStairPos(pos)
-      speak(String(pos)) // Ugglis räknar stegen högt – barnet hör talraden
+      speak(String(pos)) // Ugglis counts the steps out loud – the child hears the number line
       if (pos === landing) {
         clearInterval(hopTimer.current)
         if (landing === q.target) {
           setLocked(false)
           nextQuestion(wasFirstTry)
         } else {
-          // Landade på fel trappsteg – låt det synas, hoppa sen tillbaka
+          // Landed on the wrong step – let it show, then hop back
           setStairOops(true)
           setWrongChoice(choice)
           setAttempted(true)
-          const thing = q.dir === 'ner' ? 'godiset' : 'papegojan'
-          const word = q.dir === 'ner' ? 'steg' : 'hopp'
+          const goal = q.dir === 'down' ? sv.stair.goalDown : sv.stair.goalUp
+          const move = q.dir === 'down' ? sv.stair.moveDown : sv.stair.moveUp
           const short = dir === -1 ? landing > q.target : landing < q.target
           setFeedback({
             text: short
-              ? `Oj! ${choice} ${word} räckte inte till ${thing}. Prova igen!`
-              : `Oj! ${choice} ${word} var för många – kaninen for förbi ${thing}! Prova igen!`,
+              ? sv.stair.tooShort(choice, move, goal)
+              : sv.stair.tooFar(choice, move, goal),
             happy: false,
           })
           setTimeout(() => {
@@ -211,8 +208,9 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
     }, 550)
   }
 
-  // Scenerna för planet 5–10 (scenes.tsx) äger sina egna animationer och
-  // ropar hit när barnet svarat – LevelScreen sköter jubel och andra chansen.
+  // The scenes for planets 5–10 (scenes.tsx) own their own animations and call
+  // back here once the child has answered – LevelScreen handles the cheering
+  // and the second chance.
   function sceneRight() {
     nextQuestion(!attempted)
   }
@@ -223,8 +221,8 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
     setTimeout(() => setFeedback(null), 2200)
   }
 
-  // Kalasbordet: fel svar → de uppätna godisarna visas som bleka spöken,
-  // så barnet kan räkna både de som är kvar och de som är borta.
+  // The party table: a wrong answer → the eaten sweets are shown as pale ghosts,
+  // so the child can count both the ones left and the ones that are gone.
   function answerEat(choice: number) {
     if (locked || eating) return
     if (q.type !== 'eat') return
@@ -233,7 +231,7 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
     } else {
       setWrongChoice(choice)
       setAttempted(true)
-      setFeedback({ text: 'Titta! De bleka är uppätna. Räkna dem som är kvar!', happy: false })
+      setFeedback({ text: sv.eat.countTheRest, happy: false })
       setTimeout(() => setFeedback(null), 2500)
     }
   }
@@ -260,7 +258,7 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
         <div className="progress-dots">
           {questions.map((_, i) =>
             level.id === 10 ? (
-              // Festplaneten: varje rätt svar tänder en festlykta!
+              // The Party Planet: every correct answer lights a party lantern!
               <span key={i} className={`lantern ${i < index ? 'lit' : ''} ${i === index ? 'now' : ''}`}>
                 🏮
               </span>
@@ -274,7 +272,7 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
 
       <div className="prompt-row">
         <h2 className="prompt">{q.prompt}</h2>
-        <button className="speak-btn" onClick={() => speak(q.spoken)} aria-label="Läs upp">
+        <button className="speak-btn" onClick={() => speak(q.spoken)} aria-label={sv.level.speakLabel}>
           🔊
         </button>
       </div>
@@ -371,12 +369,12 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
             {Array.from({ length: q.hi - q.lo + 1 }).map((_, i) => {
               const n = q.lo + i
               const leftPct = ((n - q.lo + 0.5) / (q.hi - q.lo + 1)) * 100
-              const h = 16 + n * 14 // trappsteg n:s höjd i px – höjden ÄR talet
+              const h = 16 + n * 14 // the height of step n in px – the height IS the number
               return (
                 <div key={n} className={`stair-col ${n === q.target ? 'goal' : ''}`} style={{ left: `${leftPct}%` }}>
                   {n === q.target && (
                     <span className="stair-goal-emoji" style={{ bottom: `${h + 2}px` }}>
-                      {q.dir === 'ner' ? '🍬' : '🦜'}
+                      {q.dir === 'down' ? '🍬' : '🦜'}
                     </span>
                   )}
                   <span className="stair-step" style={{ height: `${h}px` }} />
@@ -456,7 +454,7 @@ export default function LevelScreen({ level, onDone, onQuit }: Props) {
             ))}
           </div>
           <button className="big-btn check-btn" onClick={checkFeed}>
-            Klart! ✅
+            {sv.level.check}
           </button>
         </>
       )}

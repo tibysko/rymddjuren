@@ -1,81 +1,84 @@
-# Mattespelet
+# The Maths Game
 
-Ett matte-spel för en 7-åring som börjar årskurs 1, byggt med React + Vite + TypeScript.
+A maths game for a 7-year-old starting Year 1, built with React + Vite + TypeScript.
 
-## Kom igång
+A technical overview of the architecture, game flow, question types and how to add
+a new mechanic can be found in [docs/CODEBASE.md](docs/CODEBASE.md).
+
+## Getting started
 
 ```bash
 npm install
 npm run dev
 ```
 
-Öppna sedan adressen som visas (vanligtvis http://localhost:5173).
+Then open the address that appears (usually http://localhost:5173).
 
-## Spela på mobilen (GitHub Pages)
+## Play on the phone (GitHub Pages)
 
-Spelet publiceras automatiskt vid varje push till `main`: workflowen
-`.github/workflows/pages.yml` bygger enfilsversionen (`npm run build:single`)
-och lägger upp `spela.html` som startsida på GitHub Pages.
+The game is published automatically on every push to `main`: the
+`.github/workflows/pages.yml` workflow builds the single-file build (`npm run build:single`)
+and publishes `play.html` as the start page on GitHub Pages.
 
-- Adress: `https://<github-användarnamn>.github.io/rymddjuren/`
-- Spara adressen som ikon på mobilens hemskärm ("Lägg till på hemskärmen")
-  så funkar det som en app
-- `npm run build:single` skapar även `spela.html` lokalt – hela spelet i en
-  fil som funkar utan server
+- Address: `https://<github-username>.github.io/rymddjuren/`
+- Save the address as an icon on the phone's home screen ("Add to Home Screen")
+  and it works like an app
+- `npm run build:single` also creates `play.html` locally – the whole game in one
+  file that works without a server
 
-## Vad ska spelet träna? (Lgr22, åk 1)
+## What should the game practise? (Lgr22, Year 1)
 
-Baserat på Skolverkets kursplan i matematik (Lgr22, centralt innehåll åk 1–3)
-och bedömningsstödet i taluppfattning för åk 1:
+Based on the Swedish National Agency for Education's maths syllabus (Lgr22, core
+content for Years 1–3) and the Year 1 assessment support material for number sense:
 
-- **Taluppfattning** – talraden 0–20 (räkna framåt/bakåt), koppla antal till siffra, talens grannar
-- **Addition & subtraktion** – först inom 0–10, sedan 0–20
-- **Talkamrater** – tals uppdelning, t.ex. 7 = 3 + 4
-- **Likhetstecknets betydelse** – "vilken term fattas?", t.ex. 3 + _ = 7
-- **Dubbelt och hälften** – proportionella samband
-- **Mönster och talföljder** – enkla talföljder och geometriska mönster
-- **Fler/färre** – jämföra antal och tal
+- **Number sense** – the number line 0–20 (counting forwards/backwards), linking quantity to numeral, a number's neighbours
+- **Addition & subtraction** – first within 0–10, then 0–20
+- **Number bonds** – splitting numbers, e.g. 7 = 3 + 4
+- **The meaning of the equals sign** – "which term is missing?", e.g. 3 + _ = 7
+- **Doubles and halves** – proportional relationships
+- **Patterns and number sequences** – simple number sequences and geometric patterns
+- **More/fewer** – comparing quantities and numbers
 
-## Designprinciper
+## Design principles
 
-- Spelaren kan läsa **väldigt enkla meningar** – alla instruktioner är korta och enkla, t.ex. "Hur många?" eller "Vilket tal fattas?"
-- Stor text, stora knappar, mer bild än text
-- Högtalarknapp 🔊 som läser upp instruktionen (talsyntes på svenska)
+- The player can read **very simple sentences** – all instructions are short and simple, e.g. "Hur många?" or "Vilket tal fattas?"
+- Large text, large buttons, more picture than text
+- A speaker button 🔊 that reads the instruction aloud (Swedish speech synthesis)
 
-## Plan (byggs steg för steg)
+## Plan (built step by step)
 
-- [x] Projektskelett (Vite + React)
-- [x] Stjärnkarta / nivåstruktur med belöningar (se DESIGN.md)
-- [x] Planet 1: Kaninplaneten – räkna antal + mata kaninen
-- [x] Planet 2: Stjärnstigen – talraden 0–20 (kaninen hoppar exakt så många hopp som barnet väljer – fel svar landar synligt fel på tallinjen, rätt svar landar på stjärnan)
-- [x] TypeScript-migrering
-- [x] Planet 3: Apornas planet – ravinhopp där valt tal = hoppets kraft (plus 0–10, "spår B", se docs/research-plattformsspel.md)
-- [x] Planet 4: Kometkalaset – minus 0–10 på tre sätt: komettrappan ner (ta bort som bakåtrörelse, trappan slutar vid 0), kalasbordet (papegojan äter synligt upp godisar – "hur många är kvar?") och trappan upp (räkna uppåt/utfyllnad, se docs/research-planet4-kometkalaset.md)
-- [x] Planet 5: Tvillingplaneten – gungbrädan tippar mot den tyngre sidan när man delar lika, studsmattan dubblar hoppet, spegeldammen visar dubbelt (se docs/research-planet5-10.md)
-- [x] Planet 6: Kompisplaneten – para ihop två högar till rävens tal (talkamrater) + tiokompisbron (tioram som bro)
-- [x] Planet 7: Vågplaneten – balansvågen ÄR banan, formaten roteras (3 + _ = 7 och 7 = 3 + _) så att likhetstecknet betyder "lika mycket", inte "här kommer svaret"
-- [x] Planet 8: Mönsterbältet – hästen galopperar i mönstret (varje färg är en ton – mönstret hörs!), talföljder och "vilken bit upprepas?"
-- [x] Planet 9: Jätteplaneten – jättehopp i två steg via vilostationen på tian (bridging through ten) på talraden 0–20
-- [x] Planet 10: Festplaneten – blandad utmaning med frågor från alla planeter, adaptivt viktade mot de planeter som fått färst stjärnor; festlyktor tänds för varje rätt svar
-- [x] GPU-rendering med PixiJS v8 (WebGPU med automatisk WebGL-fallback, se docs/research-webgpu.md): stjärnfältet bakom spelet + guldregn på resultatskärmen, och Apornas planet som riktig canvas-bana med kamera och parallax
-- [ ] Fler djur/animationer i rymdstationen
+- [x] Project skeleton (Vite + React)
+- [x] Star map / level structure with rewards (see DESIGN.md)
+- [x] Planet 1: the Rabbit Planet (Kaninplaneten) – count quantities + feed the rabbit
+- [x] Planet 2: the Star Path (Stjärnstigen) – the number line 0–20 (the rabbit hops exactly as many hops as the child picks – a wrong answer lands visibly wrong on the number line, a correct answer lands on the star)
+- [x] TypeScript migration
+- [x] Planet 3: the Monkey Planet (Apornas planet) – ravine jumping where the chosen number = the power of the jump (plus 0–10, "track B", see docs/research-platformer.md)
+- [x] Planet 4: the Comet Party (Kometkalaset) – minus 0–10 in three ways: the comet stairs going down (taking away as backward movement, the stairs stop at 0), the party table (the parrot visibly eats up the sweets – "hur många är kvar?") and the stairs going up (counting up/filling in, see docs/research-planet4-comet-party.md)
+- [x] Planet 5: the Twin Planet (Tvillingplaneten) – the seesaw tips towards the heavier side when you share equally, the trampoline doubles the jump, the mirror pond shows double (see docs/research-planet5-10.md)
+- [x] Planet 6: the Friend Planet (Kompisplaneten) – pair up two piles to make the fox's number (number bonds) + the ten-friend bridge (ten-frame as a bridge)
+- [x] Planet 7: the Scale Planet (Vågplaneten) – the balance scale IS the level, the formats are rotated (3 + _ = 7 and 7 = 3 + _) so that the equals sign means "the same amount", not "here comes the answer"
+- [x] Planet 8: the Pattern Belt (Mönsterbältet) – the horse gallops in the pattern (every colour is a note – you can hear the pattern!), number sequences and "which piece repeats?"
+- [x] Planet 9: the Giant Planet (Jätteplaneten) – giant jumps in two steps via the rest station at ten (bridging through ten) on the number line 0–20
+- [x] Planet 10: the Party Planet (Festplaneten) – mixed challenge with questions from all the planets, adaptively weighted towards the planets that have earned the fewest stars; party lanterns light up for every correct answer
+- [x] GPU rendering with PixiJS v8 (WebGPU with automatic WebGL fallback, see docs/research-webgpu.md): the starfield behind the game + golden rain on the results screen, and the Monkey Planet as a real canvas level with camera and parallax
+- [ ] More animals/animations in the space station
 
-## GPU-rendering (WebGPU/WebGL)
+## GPU rendering (WebGPU/WebGL)
 
-Två saker ritas med PixiJS v8 (`src/game/pixi.ts` väljer renderare):
+Two things are drawn with PixiJS v8 (`src/game/pixi.ts` picks the renderer):
 
-- **Effektlagret** (`SpaceBackdrop.tsx`): stjärnfält som blinkar bakom hela
-  spelet, med stjärnfall och kometer på stjärnkartan, hyperrymdsstrimmor
-  under raketresan till en planet, stjärnexplosion vid varje rätt svar
-  (`cheerBurst()` i `src/game/fx.ts`) och guld-/rödstjärneregn när en planet
-  är avklarad. Ren dekoration – `pointer-events: none`, respekterar
+- **The effect layer** (`SpaceBackdrop.tsx`): a starfield twinkling behind the whole
+  game, with shooting stars and comets on the star map, hyperspace streaks
+  during the rocket trip to a planet, a star explosion on every correct answer
+  (`cheerBurst()` in `src/game/fx.ts`) and a rain of gold/red stars when a planet
+  is completed. Pure decoration – `pointer-events: none`, respects
   `prefers-reduced-motion`.
-- **Apornas planet** (`JumpScene.tsx`): ravinhoppet som canvas-bana med mjuk
-  kamera och parallax. Knappar, Ugglis och 🔊 bor kvar i DOM.
+- **The Monkey Planet** (`JumpScene.tsx`): the ravine jump as a canvas level with a
+  smooth camera and parallax. Buttons, Ugglis and 🔊 stay in the DOM.
 
-Robusthet: WebGPU provas först med en "kanarie-rendering"; misslyckas den
-(eller kraschar WebGPU senare under körning) byter spelet till WebGL och
-minns valet i localStorage. Fungerar ingen av dem faller hoppbanan tillbaka
-till den gamla DOM-versionen – matten fungerar alltid. Tvinga renderare med
-`?renderer=webgl` eller `?renderer=webgpu` i adressraden; konsolen loggar
-vilken som används.
+Robustness: WebGPU is tried first with a "canary render"; if that fails
+(or if WebGPU crashes later at runtime) the game switches to WebGL and
+remembers the choice in localStorage. If neither works, the jump level falls back
+to the old DOM version – the maths always works. Force a renderer with
+`?renderer=webgl` or `?renderer=webgpu` in the address bar; the console logs
+which one is in use.

@@ -1,13 +1,13 @@
-// Apornas planet (planet 3): ravinhoppet som riktig canvas-bana i PixiJS.
-// Talet barnet väljer ÄR hoppets kraft: kaninen flyger en parabelbåge exakt
-// så många steg. Rätt → landar hos apan med bananen. För kort → faller
-// SYNLIGT ner i ravinen. För långt → hoppar förbi bananen. Kameran följer
-// mjukt med och bakgrundens stjärnor rör sig i parallax – plattformskänsla
-// utan att någon motorik krävs.
+// The Monkey Planet (planet 3): the ravine jump as a real canvas track in
+// PixiJS. The number the child picks IS the power of the jump: the rabbit flies
+// a parabolic arc exactly that many steps. Right → it lands with the monkey and
+// the banana. Too short → it falls VISIBLY into the ravine. Too long → it sails
+// past the banana. The camera follows smoothly and the background stars move in
+// parallax – a platformer feel without demanding any dexterity.
 //
-// Knappar, Ugglis och uppläsning bor kvar i DOM. Om varken WebGPU eller
-// WebGL fungerar faller komponenten tillbaka till den gamla DOM-scenen –
-// exakt samma matte, bara enklare grafik.
+// Buttons, Ugglis and the read-aloud button stay in the DOM. If neither WebGPU
+// nor WebGL works the component falls back to the old DOM scene – exactly the
+// same maths, just simpler graphics.
 
 import { useEffect, useRef, useState } from 'react'
 import { Container, Graphics, Text } from 'pixi.js'
@@ -15,6 +15,7 @@ import type { Application } from 'pixi.js'
 import { playTone } from '../game/sound'
 import { createPixiApp } from '../game/pixi'
 import type { JumpQuestion } from '../game/types'
+import { sv } from '../i18n/sv'
 
 interface Props {
   q: JumpQuestion
@@ -24,13 +25,13 @@ interface Props {
 }
 
 const FLIGHT_MS = 750
-const H = 320 // scenens höjd i px
-const COL_W = 88 // en talenhet i px – bredare än skärmen → kameran får jobba
+const H = 320 // the height of the scene in px
+const COL_W = 88 // one number unit in px – wider than the screen, so the camera has work to do
 const GROUND_H = 58
-const ARC = 92 // hoppbågens höjd
-const RESET_MS = 2300 // samma paus som förut innan nytt försök
+const ARC = 92 // the height of the jump arc
+const RESET_MS = 2300 // the same pause as before ahead of a new attempt
 
-// Minns om Pixi inte fungerar i den här webbläsaren (testas bara en gång)
+// Remember if Pixi does not work in this browser (only tested once)
 let pixiBroken = false
 
 export default function JumpScene(props: Props) {
@@ -39,7 +40,7 @@ export default function JumpScene(props: Props) {
   return <JumpScenePixi {...props} onFail={() => setFallback(true)} />
 }
 
-// ---------------------------------------------------------------- Pixi-banan
+// ------------------------------------------------------------- The Pixi track
 
 type Phase = 'idle' | 'fly' | 'fall' | 'past' | 'celebrate'
 
@@ -71,10 +72,10 @@ function JumpScenePixi({ q, locked, onRight, onWrong, onFail }: Props & { onFail
 
       const cols = q.hi - q.lo + 1
       const worldW = cols * COL_W
-      const groundY = H - GROUND_H // plattformarnas ovansida
+      const groundY = H - GROUND_H // the top surface of the platforms
       const xOf = (n: number) => (n - q.lo + 0.5) * COL_W
 
-      // Parallaxlager längst bak: stjärnor + en avlägsen planet
+      // Parallax layers at the very back: stars plus a distant planet
       const far = new Container()
       const near = new Container()
       const world = new Container()
@@ -93,18 +94,18 @@ function JumpScenePixi({ q, locked, onRight, onWrong, onFail }: Props & { onFail
       planet.y = 30
       far.addChild(planet)
 
-      // Mark, ravin och tal
+      // Ground, ravine and numbers
       for (let i = 0; i < cols; i++) {
         const n = q.lo + i
         const x = i * COL_W
         const isRavine = n > q.start && n < q.target
         const g = new Graphics()
         if (isRavine) {
-          // Ravinen: ett mörkt schakt – hit faller man om hoppet är för kort
+          // The ravine: a dark shaft – you fall in here if the jump is too short
           g.rect(x + 3, groundY + 26, COL_W - 6, GROUND_H - 26).fill({ color: 0x0d0620, alpha: 0.9 })
           g.moveTo(x + 3, groundY + 26)
         } else {
-          // Plattform med gräsig ovansida
+          // A platform with a grassy top
           g.roundRect(x + 3, groundY, COL_W - 6, GROUND_H - 12, 9).fill(0x3c6127)
           g.roundRect(x + 3, groundY, COL_W - 6, 12, 9).fill(0x5a8f3c)
         }
@@ -125,7 +126,7 @@ function JumpScenePixi({ q, locked, onRight, onWrong, onFail }: Props & { onFail
         world.addChild(label)
       }
 
-      // Målet: apan väntar med bananen
+      // The goal: the monkey waits with the banana
       const monkey = new Text({ text: '🐵', style: { fontSize: 42 } })
       monkey.anchor.set(0.5, 1)
       monkey.x = xOf(q.target) + 20
@@ -136,14 +137,14 @@ function JumpScenePixi({ q, locked, onRight, onWrong, onFail }: Props & { onFail
       banana.y = groundY + 2
       world.addChild(monkey, banana)
 
-      // Kaninen
+      // The rabbit
       const rabbit = new Text({ text: '🐰', style: { fontSize: 46 } })
       rabbit.anchor.set(0.5, 1)
       rabbit.x = xOf(q.start)
       rabbit.y = groundY + 2
       world.addChild(rabbit)
 
-      // Partiklar: gnistspår i luften, dammpuff vid landning, stjärnor vid rätt
+      // Particles: a sparkle trail in the air, a dust puff on landing, stars when correct
       interface P {
         g: Graphics
         vx: number
@@ -173,7 +174,7 @@ function JumpScenePixi({ q, locked, onRight, onWrong, onFail }: Props & { onFail
           const g = new Graphics().circle(0, 0, 2.5 + Math.random() * 3).fill({ color, alpha: 0.8 })
           g.x = x + (Math.random() - 0.5) * 14
           g.y = y - 2
-          const ang = Math.PI + (i / 9) * Math.PI // uppåt/utåt
+          const ang = Math.PI + (i / 9) * Math.PI // upwards/outwards
           addP(g, Math.cos(ang) * (30 + Math.random() * 50), -Math.abs(Math.sin(ang)) * (20 + Math.random() * 40), 0.55, 140)
         }
       }
@@ -191,7 +192,7 @@ function JumpScenePixi({ q, locked, onRight, onWrong, onFail }: Props & { onFail
         }
       }
 
-      // Tillstånd för animationen (utanför React – tickern äger det här)
+      // Animation state (outside React – the ticker owns this)
       let phase: Phase = 'idle'
       let t = 0
       let fromX = 0
@@ -211,7 +212,7 @@ function JumpScenePixi({ q, locked, onRight, onWrong, onFail }: Props & { onFail
         t = 0
         phase = 'fly'
         setBusy(true)
-        playTone(392, 180) // avstamp!
+        playTone(392, 180) // take-off!
       }
 
       const resetLater = () => {
@@ -233,11 +234,11 @@ function JumpScenePixi({ q, locked, onRight, onWrong, onFail }: Props & { onFail
         const dt = ticker.deltaMS / 1000
         clock += dt
 
-        // Bananen vinkar lite hela tiden – dit ska man!
+        // The banana waves a little the whole time – that is where you are going!
         banana.y = groundY + 2 - Math.abs(Math.sin(clock * 2.2)) * 6
         if (phase === 'celebrate') {
           monkey.scale.set(1 + 0.16 * Math.sin(clock * 9))
-          rabbit.y = groundY + 2 - Math.abs(Math.sin(clock * 7)) * 14 // glädjeskutt!
+          rabbit.y = groundY + 2 - Math.abs(Math.sin(clock * 7)) * 14 // a jump for joy!
         }
 
         if (phase === 'fly') {
@@ -246,46 +247,46 @@ function JumpScenePixi({ q, locked, onRight, onWrong, onFail }: Props & { onFail
           rabbit.x = fromX + (toX - fromX) * p
           rabbit.y = groundY + 2 - ARC * 4 * p * (1 - p)
           rabbit.rotation = 0.2 * Math.sin(Math.PI * p) * (toX > fromX ? 1 : -1)
-          if (Math.random() < 0.7) sparkle(rabbit.x, rabbit.y) // gnistspår i luften
+          if (Math.random() < 0.7) sparkle(rabbit.x, rabbit.y) // sparkle trail in the air
           if (p >= 1) {
             rabbit.rotation = 0
             if (landing === q.target) {
               phase = 'celebrate'
               puff(rabbit.x, groundY, 0x7bc24a)
-              starBurst(rabbit.x, groundY) // stjärnor yr hos apan!
+              starBurst(rabbit.x, groundY) // stars whirl around the monkey!
               playTone(523, 300)
               cbRef.current.onRight()
             } else if (landing < q.target) {
               phase = 'fall'
               t = 0
-              puff(rabbit.x, groundY + 30, 0x4a3a66) // mörkt damm ur ravinen
-              cbRef.current.onWrong(`Oj! ${choice} räckte inte fram – kaninen föll i ravinen! Prova igen.`)
+              puff(rabbit.x, groundY + 30, 0x4a3a66) // dark dust from the ravine
+              cbRef.current.onWrong(sv.jump.fell(choice))
               setWrongChoice(choice)
               playTone(147, 350)
               resetLater()
             } else {
               phase = 'past'
               t = 0
-              puff(rabbit.x, groundY, 0x9b8ac2) // dammpuff – hård landning!
-              cbRef.current.onWrong(`Oj! ${choice} var för långt – kaninen hoppade förbi bananen! Prova igen.`)
+              puff(rabbit.x, groundY, 0x9b8ac2) // dust puff – a hard landing!
+              cbRef.current.onWrong(sv.jump.overshot(choice))
               setWrongChoice(choice)
               playTone(147, 350)
               resetLater()
             }
           }
         } else if (phase === 'fall') {
-          // Ner i ravinen – synligt och begripligt, aldrig läskigt
+          // Down into the ravine – visible and understandable, never scary
           t += dt
           rabbit.y = Math.min(groundY + 150, groundY + 2 + t * 260)
           rabbit.rotation = Math.min(0.6, t * 1.2)
           rabbit.alpha = Math.max(0.25, 1 - t * 0.5)
         } else if (phase === 'past') {
-          // Landade förbi – kaninen vinglar till
+          // Landed past the goal – the rabbit wobbles
           t += dt
           rabbit.rotation = 0.25 * Math.sin(t * 14) * Math.max(0, 1 - t)
         }
 
-        // Uppdatera partiklarna
+        // Update the particles
         for (let i = parts.length - 1; i >= 0; i--) {
           const pt = parts[i]
           pt.life -= dt
@@ -299,11 +300,11 @@ function JumpScenePixi({ q, locked, onRight, onWrong, onFail }: Props & { onFail
           }
         }
 
-        // Kameran: följ kaninen mjukt, håll dig innanför världen
+        // The camera: follow the rabbit smoothly, stay inside the world
         const viewW = app.screen.width
         let target = rabbit.x - viewW * 0.45
         if (worldW <= viewW) {
-          target = (worldW - viewW) / 2 // liten värld → centrera
+          target = (worldW - viewW) / 2 // small world → centre it
         } else {
           target = Math.max(0, Math.min(worldW - viewW, target))
         }
@@ -327,7 +328,7 @@ function JumpScenePixi({ q, locked, onRight, onWrong, onFail }: Props & { onFail
         app = null
       }
     }
-    // Scenen monteras om per fråga (key={index}) – q är stabil här
+    // The scene is remounted per question (key={index}) – q is stable here
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -351,7 +352,7 @@ function JumpScenePixi({ q, locked, onRight, onWrong, onFail }: Props & { onFail
   )
 }
 
-// ------------------------------------------------- DOM-fallback (som förut)
+// ------------------------------------------ DOM fallback (exactly as before)
 
 function JumpSceneDom({ q, locked, onRight, onWrong }: Props) {
   const [jumpX, setJumpX] = useState<number | null>(null)
@@ -402,10 +403,10 @@ function JumpSceneDom({ q, locked, onRight, onWrong }: Props) {
       if (landing < q.target) {
         setJumpFell(true)
         setJumpY(-DROP)
-        onWrong(`Oj! ${choice} räckte inte fram – kaninen föll i ravinen! Prova igen.`)
+        onWrong(sv.jump.fell(choice))
       } else {
         setJumpY(0)
-        onWrong(`Oj! ${choice} var för långt – kaninen hoppade förbi bananen! Prova igen.`)
+        onWrong(sv.jump.overshot(choice))
       }
       timers.current.push(
         setTimeout(() => {

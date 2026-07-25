@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import { LEVELS } from '../game/levels'
 import type { Level, Progress } from '../game/types'
+import { sv } from '../i18n/sv'
 
 interface Props {
   progress: Progress
@@ -8,8 +9,8 @@ interface Props {
   onStation: () => void
 }
 
-// I dev-läge (npm run dev) är alla banor upplåsta så man kan testa direkt.
-// Den byggda spela.html är en produktionsbygge → normal upplåsning gäller där.
+// In dev mode (npm run dev) every level is unlocked so it can be tested right away.
+// The built single-file page is a production build → normal unlocking applies there.
 const DEV = import.meta.env.DEV
 
 export default function StarMap({ progress, onPlay, onStation }: Props) {
@@ -24,14 +25,17 @@ export default function StarMap({ progress, onPlay, onStation }: Props) {
   return (
     <div className="starmap">
       <header className="starmap-header">
-        <h1>🚀 Rymddjuren{DEV && <span className="dev-badge">🔧 DEV</span>}</h1>
+        <h1>
+          {sv.map.title}
+          {DEV && <span className="dev-badge">🔧 DEV</span>}
+        </h1>
         <button className="station-btn" onClick={onStation}>
-          🛰️ Min rymdstation
+          {sv.map.stationButton}
         </button>
       </header>
 
       <p className="ugglis-hello">
-        <span className="ugglis">🦉</span> Hej! Jag är Ugglis. Vilken planet ska vi flyga till?
+        <span className="ugglis">🦉</span> {sv.map.greeting}
       </p>
 
       <div className="planets">
@@ -50,8 +54,8 @@ export default function StarMap({ progress, onPlay, onStation }: Props) {
               <span className="planet-ball">{unlocked ? level.animal : '🔒'}</span>
               <span className="planet-name">{level.name}</span>
               <span className="planet-desc">
-                {unlocked ? level.desc : 'Låst'}
-                {unlocked && !level.generate ? ' (kommer snart!)' : ''}
+                {unlocked ? level.desc : sv.map.locked}
+                {unlocked && !level.generate ? sv.map.comingSoon : ''}
               </span>
               <span className="planet-stars">
                 {[1, 2, 3].map((s) => (

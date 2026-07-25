@@ -1,14 +1,15 @@
-// Scener för planet 5–10. Varje scen äger sin egen animation och ropar
-// onRight()/onWrong(text) – LevelScreen sköter jubel, andra chansen och
-// räkningen. Scenerna monteras om per fråga (key={index}), så intern state
-// nollställs automatiskt.
+// Scenes for planets 5–10. Every scene owns its own animation and calls
+// onRight()/onWrong(text) – LevelScreen handles the cheering, the second chance
+// and the scoring. The scenes are remounted per question (key={index}), so
+// internal state resets automatically.
 //
-// Designregeln överallt: fel svar ger ett SYNLIGT, begripligt resultat i
-// spelvärlden – gungbrädan tippar, vågen lutar, hästen stannar.
+// The design rule everywhere: a wrong answer produces a VISIBLE, understandable
+// result in the game world – the seesaw tips, the scale leans, the horse stops.
 
 import { useEffect, useRef, useState } from 'react'
 import { playPatternTone, playTone } from '../game/sound'
 import { speak } from '../game/speech'
+import { sv } from '../i18n/sv'
 import type {
   BalanceQuestion,
   DoubleQuestion,
@@ -45,8 +46,8 @@ function useTimers() {
   }
 }
 
-// ---- Tvillingplaneten: gungbrädan – dela lika ----
-// Brädan tippar HELA TIDEN mot den tyngre sidan: obalans syns och känns.
+// ---- The Twin Planet: the seesaw – share equally ----
+// The beam tips towards the heavier side AT ALL TIMES: imbalance is visible.
 
 export function ShareScene({ q, locked, onRight, onWrong }: SceneProps<ShareQuestion>) {
   const [left, setLeft] = useState(0)
@@ -69,9 +70,9 @@ export function ShareScene({ q, locked, onRight, onWrong }: SceneProps<ShareQues
   function check() {
     if (locked) return
     if (remaining > 0) {
-      onWrong('Dela ut alla pinnar först!')
+      onWrong(sv.share.shareAllFirst)
     } else if (left !== right) {
-      onWrong(`Gungbrädan tippar! ${left} och ${right} är inte lika.`)
+      onWrong(sv.share.tilting(left, right))
     } else {
       onRight()
     }
@@ -85,16 +86,26 @@ export function ShareScene({ q, locked, onRight, onWrong }: SceneProps<ShareQues
             <span key={i} className="share-pile-item">{q.item}</span>
           ))
         ) : (
-          <span className="share-pile-empty">Allt utdelat!</span>
+          <span className="share-pile-empty">{sv.share.allShared}</span>
         )}
       </div>
+      {remaining > 0 && (
+        <p className="share-help">{sv.share.help}</p>
+      )}
       <div className="seesaw">
         <div className="seesaw-beam" style={{ transform: `rotate(${tilt}deg)` }}>
           <div className="seesaw-end">
-            <button className="seesaw-panda" data-side="left" onClick={() => give('left')} aria-label="Ge vänster panda">
-              🐼
+            <button
+              className="seesaw-panda"
+              data-side="left"
+              onClick={() => give('left')}
+              disabled={locked || remaining === 0}
+              aria-label={sv.share.giveLeftLabel}
+            >
+              <span aria-hidden="true">🐼</span>
+              <span className="seesaw-give-label">{sv.share.giveLabel}</span>
             </button>
-            <button className="seesaw-items" onClick={() => takeBack('left')} aria-label="Ta tillbaka från vänster">
+            <button className="seesaw-items" onClick={() => takeBack('left')} aria-label={sv.share.takeBackLeftLabel}>
               {Array.from({ length: left }).map((_, i) => (
                 <span key={i}>{q.item}</span>
               ))}
@@ -102,10 +113,17 @@ export function ShareScene({ q, locked, onRight, onWrong }: SceneProps<ShareQues
             </button>
           </div>
           <div className="seesaw-end">
-            <button className="seesaw-panda" data-side="right" onClick={() => give('right')} aria-label="Ge höger panda">
-              🐼
+            <button
+              className="seesaw-panda"
+              data-side="right"
+              onClick={() => give('right')}
+              disabled={locked || remaining === 0}
+              aria-label={sv.share.giveRightLabel}
+            >
+              <span aria-hidden="true">🐼</span>
+              <span className="seesaw-give-label">{sv.share.giveLabel}</span>
             </button>
-            <button className="seesaw-items" onClick={() => takeBack('right')} aria-label="Ta tillbaka från höger">
+            <button className="seesaw-items" onClick={() => takeBack('right')} aria-label={sv.share.takeBackRightLabel}>
               {Array.from({ length: right }).map((_, i) => (
                 <span key={i}>{q.item}</span>
               ))}
@@ -116,13 +134,13 @@ export function ShareScene({ q, locked, onRight, onWrong }: SceneProps<ShareQues
         <div className="seesaw-base" />
       </div>
       <button className="big-btn check-btn" onClick={check}>
-        Klart! ✅
+        {sv.level.check}
       </button>
     </>
   )
 }
 
-// ---- Tvillingplaneten: studsmattan – valt tal × 2 = landningen ----
+// ---- The Twin Planet: the trampoline – chosen number × 2 = the landing ----
 
 export function DoubleScene({ q, locked, onRight, onWrong }: SceneProps<DoubleQuestion>) {
   const [pos, setPos] = useState(0)
@@ -135,14 +153,14 @@ export function DoubleScene({ q, locked, onRight, onWrong }: SceneProps<DoubleQu
     setBusy(true)
     setChosen(c)
     let p = 0
-    // Fas 1: hoppa fram till studsmattan på c...
+    // Phase 1: hop over to the trampoline at c...
     const first = every(() => {
       p += 1
       setPos(p)
       if (p === c) {
         clearInterval(first)
         playTone(392, 260) // boing!
-        // ...fas 2: studsmattan skickar kaninen lika långt till – dubbelt!
+        // ...phase 2: the trampoline sends the rabbit just as far again – double!
         later(() => {
           const second = every(() => {
             p += 1
@@ -152,7 +170,7 @@ export function DoubleScene({ q, locked, onRight, onWrong }: SceneProps<DoubleQu
               if (2 * c === q.target) {
                 onRight()
               } else {
-                onWrong(`Du hoppade ${c} – studsmattan gjorde ${2 * c}! Stjärnan är på ${q.target}.`)
+                onWrong(sv.double.landedWrong(c, 2 * c, q.target))
                 later(() => {
                   setPos(0)
                   setChosen(null)
@@ -189,7 +207,7 @@ export function DoubleScene({ q, locked, onRight, onWrong }: SceneProps<DoubleQu
   )
 }
 
-// ---- Kompisplaneten: para ihop två högar till rävens tal ----
+// ---- The Friend Planet: pair up two piles to make the fox's number ----
 
 export function PairScene({ q, locked, onRight, onWrong }: SceneProps<PairQuestion>) {
   const [sel, setSel] = useState<number[]>([])
@@ -212,7 +230,7 @@ export function PairScene({ q, locked, onRight, onWrong }: SceneProps<PairQuesti
           playTone(523, 300)
           onRight()
         } else {
-          onWrong(`${a} och ${b} blir ${a + b} – räven vill ha ${q.want}!`)
+          onWrong(sv.pair.wrongSum(a, b, a + b, q.want))
           later(() => {
             setSel([])
             setBusy(false)
@@ -256,7 +274,7 @@ export function PairScene({ q, locked, onRight, onWrong }: SceneProps<PairQuesti
   )
 }
 
-// ---- Vågplaneten: gör lika – vågen tippar mot den tyngre sidan ----
+// ---- The Scale Planet: make it equal – the scale tips towards the heavier side ----
 
 function Basket({ value }: { value: number | null }) {
   return (
@@ -290,11 +308,7 @@ export function BalanceScene({ q, locked, onRight, onWrong }: SceneProps<Balance
         playTone(523, 350)
         onRight()
       } else {
-        onWrong(
-          d > 0
-            ? `Vågen tippar åt vänster – ${c} är för lite i facket!`
-            : `Vågen tippar åt höger – ${c} är för mycket i facket!`,
-        )
+        onWrong(d > 0 ? sv.balance.tooLittle(c) : sv.balance.tooMuch(c))
         later(() => {
           setPlaced(null)
           setBusy(false)
@@ -333,16 +347,16 @@ export function BalanceScene({ q, locked, onRight, onWrong }: SceneProps<Balance
   )
 }
 
-// ---- Mönsterbältet: galoppbanan – mönstret bär hästen (och hörs!) ----
+// ---- The Pattern Belt: the gallop track – the pattern carries the horse (and can be heard!) ----
 
 export function PatternScene({ q, locked, onRight, onWrong }: SceneProps<PatternQuestion>) {
-  const [horse, setHorse] = useState(-1) // index hästen står på
+  const [horse, setHorse] = useState(-1) // the index the horse is standing on
   const [filled, setFilled] = useState<string | null>(null)
-  const [busy, setBusy] = useState(true) // upptagen under introgaloppen
+  const [busy, setBusy] = useState(true) // busy during the intro gallop
   const [oops, setOops] = useState(false)
   const { later, every } = useTimers()
 
-  // Introgalopp: hästen travar över mönstret i rytm – varje färg är en ton
+  // Intro gallop: the horse trots across the pattern in rhythm – every colour is a tone
   useEffect(() => {
     if (q.mode !== 'next') {
       setBusy(false)
@@ -366,20 +380,20 @@ export function PatternScene({ q, locked, onRight, onWrong }: SceneProps<Pattern
     if (locked || busy) return
     if (q.mode === 'unit') {
       if (c === q.answer) onRight()
-      else onWrong('Nästan! Vilken bit kommer om och om igen?')
+      else onWrong(sv.pattern.wrongUnit)
       return
     }
     setBusy(true)
     setFilled(c)
     later(() => {
-      setHorse(q.sequence.length) // hästen hoppar på den valda asteroiden
+      setHorse(q.sequence.length) // the horse jumps onto the chosen asteroid
       if (c === q.answer) {
         playPatternTone(c)
         onRight()
       } else {
-        playTone(147, 350) // dov "fel" ton – mönstret bröts
+        playTone(147, 350) // a dull "wrong" tone – the pattern was broken
         setOops(true)
-        onWrong('Hoppsan – det bröt mönstret! Titta och lyssna igen.')
+        onWrong(sv.pattern.broken)
         later(() => {
           setFilled(null)
           setOops(false)
@@ -419,7 +433,7 @@ export function PatternScene({ q, locked, onRight, onWrong }: SceneProps<Pattern
   )
 }
 
-// ---- Jätteplaneten: jättehopp i två steg – via vilostationen på 10 ----
+// ---- The Giant Planet: giant jumps in two steps – via the rest stop at 10 ----
 
 export function Via10Scene({ q, locked, onRight, onWrong }: SceneProps<Via10Question>) {
   const [pos, setPos] = useState(q.start)
@@ -441,12 +455,12 @@ export function Via10Scene({ q, locked, onRight, onWrong }: SceneProps<Via10Ques
     const id = every(() => {
       p += dir
       setPos(p)
-      speak(String(p)) // Ugglis räknar hoppen högt
+      speak(String(p)) // Ugglis counts the hops out loud
       if (p === landing) {
         clearInterval(id)
         if (landing === goal) {
           if (phase === 1) {
-            playTone(659, 350) // vilostationen firar!
+            playTone(659, 350) // the rest stop celebrates!
             later(() => {
               setPhase(2)
               setBusy(false)
@@ -458,8 +472,8 @@ export function Via10Scene({ q, locked, onRight, onWrong }: SceneProps<Via10Ques
           setOopsAt(landing)
           onWrong(
             phase === 1
-              ? `Oj! Du landade på ${landing} – hoppa till tian först!`
-              : `Oj! Du landade på ${landing} – stjärnan är på ${q.target}.`,
+              ? sv.via10.missedTen(landing)
+              : sv.via10.missedStar(landing, q.target),
           )
           later(() => {
             setPos(from)
@@ -486,7 +500,7 @@ export function Via10Scene({ q, locked, onRight, onWrong }: SceneProps<Via10Ques
           )
         })}
       </div>
-      <p className="via10-hint">{phase === 1 ? 'Först: hoppa till tian! 🚩' : 'Nu resten – till stjärnan! ⭐'}</p>
+      <p className="via10-hint">{phase === 1 ? sv.via10.hintPhase1 : sv.via10.hintPhase2}</p>
       <div className="choices">
         {(phase === 1 ? q.choices1 : q.choices2).map((c) => (
           <button key={c} className="choice-btn" onClick={() => choose(c)}>

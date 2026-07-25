@@ -1,6 +1,6 @@
-// Service worker: gör att spelet funkar offline.
-// Strategi: nätverket först (så nya versioner alltid kommer in när det finns
-// uppkoppling), cachen som reserv när mobilen är offline.
+// Service worker: makes the game work offline.
+// Strategy: network first (so new versions always arrive when there is a
+// connection), the cache as a fallback when the phone is offline.
 const CACHE = 'rymddjuren-v1'
 
 self.addEventListener('install', (event) => {
@@ -27,12 +27,12 @@ self.addEventListener('fetch', (event) => {
       } catch {
         const cached = await cache.match(req, { ignoreSearch: true })
         if (cached) return cached
-        // Navigering utan cache-träff: prova startsidan
+        // Navigation with no cache hit: try the start page
         if (req.mode === 'navigate') {
           const start = await cache.match('./')
           if (start) return start
         }
-        throw new Error('offline och ingen cache')
+        throw new Error('offline and no cache')
       }
     })()
   )

@@ -1,4 +1,5 @@
 import type { Level } from '../game/types'
+import { sv } from '../i18n/sv'
 
 interface Props {
   level: Level
@@ -10,7 +11,7 @@ interface Props {
 export default function ResultScreen({ level, stars, newAnimal, onBack }: Props) {
   return (
     <div className="result">
-      <h1>Du klarade {level.name}! 🎉</h1>
+      <h1>{sv.result.heading(level.name)}</h1>
       <div className="result-stars">
         {[1, 2, 3].map((s) => (
           <span key={s} className={s <= stars ? 'star big on' : 'star big'}>★</span>
@@ -20,14 +21,14 @@ export default function ResultScreen({ level, stars, newAnimal, onBack }: Props)
         <p className="result-animal">
           <span className="result-animal-emoji">{level.animal}</span>
           <br />
-          {level.animalName} flyttar in i din rymdstation!
+          {sv.result.newAnimal(level.animalName)}
         </p>
       )}
       <p className="ugglis-hello">
-        <span className="ugglis">🦉</span> Bra jobbat, rymdhjälte!
+        <span className="ugglis">🦉</span> {sv.result.praise}
       </p>
       <button className="big-btn" onClick={onBack}>
-        Till stjärnkartan 🚀
+        {sv.result.back}
       </button>
     </div>
   )

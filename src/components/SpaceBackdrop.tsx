@@ -1,20 +1,20 @@
-// Effektlagret: en helskärms-canvas BAKOM spelet (pointer-events: none).
+// The effect layer: a fullscreen canvas BEHIND the game (pointer-events: none).
 //
-// Lägen:
-//  - 'calm'   – stjärnfält i tre parallaxlager som blinkar, med stjärnfall
-//               då och då och en och annan komet. (Stjärnkartan, banorna.)
-//  - 'travel' – hyperrymd! Stjärnorna strimmar förbi – raketen är på väg.
-//  - 'cheer'  – guld- och rödstjärnor regnar. (Resultatskärmen.)
-// Dessutom: cheerBurst() (src/game/fx.ts) ger en stjärnexplosion när som
-// helst – används vid varje rätt svar.
+// Modes:
+//  - 'calm'   – a starfield in three parallax layers that twinkle, with the
+//               occasional shooting star and comet. (Star map, levels.)
+//  - 'travel' – hyperspace! The stars streak past – the rocket is on its way.
+//  - 'cheer'  – gold and red stars rain down. (Result screen.)
+// On top of that: cheerBurst() (src/game/fx.ts) fires a star burst at any
+// time – used on every correct answer.
 //
-// Viktigt: lagret är ren dekoration. Ingen mekanik, inga knappar, ingen
-// information som behövs för att lösa uppgifterna får bo här. Saknas
-// WebGPU/WebGL, eller vill spelaren ha mindre rörelse (prefers-reduced-motion),
-// renderas ingenting – CSS-bakgrunden finns kvar precis som förut.
+// Important: this layer is pure decoration. No mechanics, no buttons, and no
+// information needed to solve the tasks may live here. If WebGPU/WebGL is
+// missing, or the player wants less motion (prefers-reduced-motion), nothing
+// is rendered – the CSS background stays exactly as before.
 //
-// OBS: vi ritar med Graphics/Text direkt (inte generateTexture/Sprite) –
-// det fungerar pålitligt i både WebGPU och WebGL. Pixi batchar ändå.
+// NOTE: we draw with Graphics/Text directly (not generateTexture/Sprite) –
+// that works reliably in both WebGPU and WebGL. Pixi batches it anyway.
 
 import { useEffect, useRef } from 'react'
 import { Container, Graphics, Text } from 'pixi.js'
@@ -31,7 +31,7 @@ interface StarG extends Graphics {
   twPhase: number
 }
 
-/** Fri partikel: regn, bursts, stjärnfall, kometer */
+/** Free particle: rain, bursts, shooting stars, comets */
 interface Particle {
   g: Graphics | Text
   vx: number
@@ -69,17 +69,17 @@ export default function SpaceBackdrop({ mode }: { mode: BackdropMode }) {
       }
       app = created
       holder.current.appendChild(app.canvas)
-      // Canvas-stjärnorna tar över – släck CSS-prickarna så det inte blir dubbelt
+      // The canvas stars take over – turn off the CSS dots so they do not double up
       document.body.classList.add('gpu-stars')
 
-      // --- Stjärnfältet: tre lager, längre bort = mindre och långsammare ---
+      // --- The starfield: three layers, further away = smaller and slower ---
       const field = new Container()
       app.stage.addChild(field)
       const stars: StarG[] = []
       const area = app.screen.width * app.screen.height
       const count = Math.min(260, Math.round(area / 4200))
       for (let i = 0; i < count; i++) {
-        const layer = i % 3 // 0 = längst bort
+        const layer = i % 3 // 0 = furthest away
         const color = i % 5 === 0 ? GOLD : WHITE
         const r = [0.9, 1.4, 2.3][layer] * (0.7 + Math.random() * 0.6)
         const s = (
@@ -92,13 +92,13 @@ export default function SpaceBackdrop({ mode }: { mode: BackdropMode }) {
         s.baseAlpha = [0.35, 0.55, 0.85][layer]
         s.alpha = s.baseAlpha
         s.speed = [4, 9, 16][layer] * (0.8 + Math.random() * 0.4)
-        s.twSpeed = 0.8 + Math.random() * 2.2 // blinktakt
+        s.twSpeed = 0.8 + Math.random() * 2.2 // twinkle rate
         s.twPhase = Math.random() * Math.PI * 2
         stars.push(s)
         field.addChild(s)
       }
 
-      // --- Fria partiklar: guldregn, bursts, stjärnfall och kometer ---
+      // --- Free particles: golden rain, bursts, shooting stars and comets ---
       const fxLayer = new Container()
       app.stage.addChild(fxLayer)
       const parts: Particle[] = []
@@ -119,13 +119,13 @@ export default function SpaceBackdrop({ mode }: { mode: BackdropMode }) {
           vx: (Math.random() - 0.5) * 40,
           vy: 70 + Math.random() * 130,
           vr: (Math.random() - 0.5) * 4,
-          life: 30, // dör via nedre kanten
+          life: 30, // dies by leaving the bottom edge
           maxLife: 30,
           grav: 60,
         })
       }
 
-      // Stjärnexplosion – vid varje rätt svar! (registreras i fx.ts)
+      // Star burst – on every correct answer! (registered in fx.ts)
       function burst() {
         if (!app) return
         const w = app.screen.width
@@ -151,13 +151,13 @@ export default function SpaceBackdrop({ mode }: { mode: BackdropMode }) {
         }
       }
 
-      // Stjärnfall: en ljus strimma som far diagonalt och lämnar spår
+      // Shooting star: a bright streak that flies diagonally and leaves a trail
       function spawnShootingStar(w: number, h: number) {
         const g = new Graphics().circle(0, 0, 2.6).fill(WHITE)
         g.x = Math.random() * w * 0.8
         g.y = Math.random() * h * 0.3
         const speed = 520 + Math.random() * 260
-        const ang = Math.PI * (0.12 + Math.random() * 0.12) // snett nedåt höger
+        const ang = Math.PI * (0.12 + Math.random() * 0.12) // diagonally down to the right
         addPart(g, {
           vx: Math.cos(ang) * speed,
           vy: Math.sin(ang) * speed,
@@ -168,7 +168,7 @@ export default function SpaceBackdrop({ mode }: { mode: BackdropMode }) {
         })
       }
 
-      // Komet: seglar långsamt förbi med glittersvans
+      // Comet: sails slowly past with a glittering tail
       function spawnComet(w: number, h: number) {
         const c = new Text({ text: '☄️', style: { fontSize: 30 + Math.random() * 14 } })
         c.anchor.set(0.5)
@@ -189,9 +189,9 @@ export default function SpaceBackdrop({ mode }: { mode: BackdropMode }) {
 
       let clock = 0
       let spawnDebt = 0
-      let shootIn = 2.5 + Math.random() * 4 // första stjärnfallet kommer snart
+      let shootIn = 2.5 + Math.random() * 4 // the first shooting star comes soon
       let cometIn = 9 + Math.random() * 14
-      let streak = 1 // 1 = vanlig prick, högre = hyperrymdsstrimma
+      let streak = 1 // 1 = a normal dot, higher = a hyperspace streak
 
       app.ticker.add((ticker) => {
         if (!app) return
@@ -201,10 +201,10 @@ export default function SpaceBackdrop({ mode }: { mode: BackdropMode }) {
         const h = app.screen.height
         const m = modeRef.current
 
-        // Hyperrymd: mjuk övergång in/ut ur strimm-läget
+        // Hyperspace: smooth transition in and out of streak mode
         const targetStreak = m === 'travel' ? 9 : 1
         streak += (targetStreak - streak) * Math.min(1, dt * 6)
-        const speedFactor = 1 + (streak - 1) * 5 // strimmigare = snabbare
+        const speedFactor = 1 + (streak - 1) * 5 // more streaky = faster
 
         for (const s of stars) {
           s.x -= s.speed * dt * 0.6
@@ -215,7 +215,7 @@ export default function SpaceBackdrop({ mode }: { mode: BackdropMode }) {
           }
           if (s.x < -8) s.x = w + 8
           s.scale.y = streak
-          // Blinka lugnt – men inte mitt i hyperrymden
+          // Twinkle calmly – but not in the middle of hyperspace
           s.alpha =
             streak > 1.5
               ? s.baseAlpha
@@ -235,7 +235,7 @@ export default function SpaceBackdrop({ mode }: { mode: BackdropMode }) {
           }
         }
 
-        // Guldregn på resultatskärmen – tätt och festligt!
+        // Golden rain on the result screen – dense and festive!
         if (m === 'cheer') {
           spawnDebt += dt * 44
           while (spawnDebt >= 1 && parts.length < 320) {
@@ -246,7 +246,7 @@ export default function SpaceBackdrop({ mode }: { mode: BackdropMode }) {
           spawnDebt = 0
         }
 
-        // Uppdatera alla fria partiklar
+        // Update every free particle
         for (let i = parts.length - 1; i >= 0; i--) {
           const p = parts[i]
           p.life -= dt
@@ -254,7 +254,7 @@ export default function SpaceBackdrop({ mode }: { mode: BackdropMode }) {
           p.g.x += p.vx * dt
           p.g.y += p.vy * dt
           p.g.rotation += p.vr * dt
-          // Stjärnfall och kometer lämnar glitterspår efter sig
+          // Shooting stars and comets leave a glitter trail behind them
           const isComet = p.g instanceof Text
           if (p.grav === 0 && (Math.abs(p.vx) > 220 || isComet) && Math.random() < (isComet ? 0.45 : 0.75)) {
             const t = new Graphics().circle(0, 0, isComet ? 1.9 : 1.6).fill(isComet || p.vx < 0 ? GOLD : WHITE)
@@ -262,7 +262,7 @@ export default function SpaceBackdrop({ mode }: { mode: BackdropMode }) {
             t.y = p.g.y + (isComet ? 6 : 0)
             addPart(t, { vx: 0, vy: 8, vr: 0, life: isComet ? 0.8 : 0.4, maxLife: isComet ? 0.8 : 0.4, grav: 0 })
           }
-          // Tona ut mot slutet av livet
+          // Fade out towards the end of the lifetime
           if (p.maxLife <= 2) p.g.alpha = Math.min(1, p.life / (p.maxLife * 0.5))
           if (p.life <= 0 || p.g.y > h + 40 || p.g.x < -60) {
             parts.splice(i, 1)
@@ -274,7 +274,7 @@ export default function SpaceBackdrop({ mode }: { mode: BackdropMode }) {
 
     boot()
 
-    // Om WebGPU går sönder mitt i sessionen: riv och starta om på WebGL
+    // If WebGPU breaks mid-session: tear down and restart on WebGL
     const offFallback = onRendererFallback(() => {
       if (disposed) return
       if (app) {

@@ -24,14 +24,14 @@ body {
   background-attachment: fixed;
   color: var(--text);
   min-height: 100vh;
-  /* Spel, inte text: långtryck ska inte markera emojis eller visa lupp */
+  /* A game, not text: long-press must not select emoji or show the magnifier */
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
 }
 
 button {
-  /* Snabba dubbeltryck ska trycka två gånger – inte zooma in sidan */
+  /* Quick double taps should press twice – not zoom the page in */
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
@@ -40,8 +40,8 @@ button {
   max-width: 720px;
   margin: 0 auto;
   padding: 1rem;
-  /* I helskärmsläge (hemskärmsikon) får inget hamna under mobilens
-     statusfält eller "notch" – env() är 0 i vanlig webbläsare */
+  /* In fullscreen mode (home-screen icon) nothing may end up under the
+     phone's status bar or notch – env() is 0 in a normal browser */
   padding-top: calc(1rem + env(safe-area-inset-top, 0px));
   padding-left: calc(1rem + env(safe-area-inset-left, 0px));
   padding-right: calc(1rem + env(safe-area-inset-right, 0px));
@@ -71,7 +71,7 @@ h1 {
   padding: 0.15rem 0.55rem;
 }
 
-/* ---- Stjärnkartan ---- */
+/* ---- The star map ---- */
 
 .starmap-header {
   display: flex;
@@ -167,7 +167,7 @@ h1 {
   font-size: 3rem;
 }
 
-/* ---- Banan ---- */
+/* ---- The level ---- */
 
 .level {
   display: flex;
@@ -190,7 +190,7 @@ h1 {
   border-radius: 12px;
   font-size: 1.4rem;
   padding: 0.4rem 0.7rem;
-  /* Minst 48×48 px tryckyta för små tummar */
+  /* At least a 48×48 px touch target for small thumbs */
   min-width: 48px;
   min-height: 48px;
   cursor: pointer;
@@ -292,7 +292,7 @@ h1 {
   75% { transform: translateX(6px); }
 }
 
-/* Stjärnstigen – stenar och hopp */
+/* The Star Path – stones and hops */
 
 .stones {
   display: flex;
@@ -319,7 +319,7 @@ h1 {
   transition: all 0.3s;
 }
 
-/* Kaninen landade på fel sten – skaka till så att felet syns */
+/* The rabbit landed on the wrong stone – shake so the mistake is visible */
 .stone-top.oops {
   animation: shake 0.5s 2;
 }
@@ -348,10 +348,10 @@ h1 {
   font-size: 1.5rem;
 }
 
-/* Apornas planet – ravinhopp (sidscrollande scen) */
+/* The Monkey Planet – ravine jump (side-scrolling scene) */
 
 .jump-scene {
-  --jump-ground: 46px; /* markytans höjd från scenens botten */
+  --jump-ground: 46px; /* height of the ground from the bottom of the scene */
   position: relative;
   width: min(640px, 92vw);
   height: 210px;
@@ -379,7 +379,7 @@ h1 {
   border-top: 4px solid #7bc24a;
 }
 
-/* Ravinen: ingen markyta – ett mörkt gap att falla i */
+/* The ravine: no ground – a dark gap to fall into */
 .jump-col.ravine .jump-platform {
   background: none;
   border-top: none;
@@ -422,12 +422,12 @@ h1 {
   filter: drop-shadow(0 3px 3px #0007);
 }
 
-/* Fall ner i ravinen – mjuk nedåtrörelse */
+/* Falling into the ravine – a soft downward motion */
 .jump-rabbit.falling {
   transition: bottom 0.45s ease-in;
 }
 
-/* Kometkalaset – komettrappan (subtraktion som rörelse i trappan) */
+/* The Comet Party – the comet stairs (subtraction as movement on the stairs) */
 
 .stair-scene {
   position: relative;
@@ -458,7 +458,7 @@ h1 {
   width: 2.6rem;
 }
 
-/* Trappsteget – höjden ÄR talet, så trappan blir en synlig tallinje på höjden */
+/* The step – the height IS the number, so the stairs become a visible vertical number line */
 .stair-step {
   display: block;
   width: 2.6rem;
@@ -499,12 +499,12 @@ h1 {
   transition: left 0.4s ease, bottom 0.4s ease;
 }
 
-/* Landade på fel trappsteg – skaka till så att felet syns */
+/* Landed on the wrong step – shake so the mistake is visible */
 .stair-rabbit.oops {
   animation: shake 0.5s 2;
 }
 
-/* Kometkalaset – kalasbordet (papegojan äter synligt upp godisar) */
+/* The Comet Party – the party table (the parrot visibly eats the sweets) */
 
 .party-scene {
   display: flex;
@@ -520,7 +520,7 @@ h1 {
   transition: transform 0.2s;
 }
 
-/* Papegojan gnussar fram och tillbaka medan den äter */
+/* The parrot nuzzles back and forth while it eats */
 .party-parrot.munching {
   animation: munch 0.7s infinite;
 }
@@ -547,24 +547,24 @@ h1 {
   transition: opacity 0.5s, filter 0.5s;
 }
 
-/* Uppäten – borta, men platsen finns kvar så mönstret inte hoppar */
+/* Eaten – gone, but the slot remains so the layout does not jump */
 .candy.gone {
   opacity: 0;
 }
 
-/* Andra chansen: uppätna godisar som bleka spöken – räkningshjälp */
+/* Second chance: eaten sweets as pale ghosts – a counting aid */
 .candy.ghost {
   opacity: 0.25;
   filter: grayscale(1);
 }
 
-/* Medan papegojan äter: vänta med att svara */
+/* While the parrot is eating: wait before answering */
 .choices.waiting {
   opacity: 0.4;
   pointer-events: none;
 }
 
-/* Långa tallinjer (studsmattan, Jätteplaneten): mindre stenar så allt ryms */
+/* Long number lines (the trampoline, the Giant Planet): smaller stones so everything fits */
 
 .stones.long {
   gap: 0.25rem;
@@ -601,7 +601,7 @@ h1 {
   padding: 0.4rem 1.1rem;
 }
 
-/* Tvillingplaneten – gungbrädan */
+/* The Twin Planet – the seesaw */
 
 .share-pile {
   display: flex;
@@ -623,6 +623,13 @@ h1 {
 .share-pile-empty {
   font-size: 1rem;
   opacity: 0.8;
+}
+
+.share-help {
+  color: var(--accent-yellow);
+  font-size: 1.05rem;
+  font-weight: 800;
+  text-align: center;
 }
 
 .seesaw {
@@ -651,15 +658,40 @@ h1 {
 }
 
 .seesaw-panda {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  min-width: 5.6rem;
+  min-height: 5.6rem;
+  padding: 0.25rem 0.45rem;
   font-size: 2.8rem;
-  background: none;
-  border: none;
+  color: var(--text);
+  background: rgba(255, 211, 42, 0.13);
+  border: 3px solid var(--accent-yellow);
+  border-radius: 18px;
   cursor: pointer;
   transition: transform 0.15s;
 }
 
 .seesaw-panda:hover {
   transform: scale(1.12);
+}
+
+.seesaw-panda:active {
+  transform: scale(0.96);
+}
+
+.seesaw-panda:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+
+.seesaw-give-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .seesaw-items {
@@ -693,7 +725,7 @@ h1 {
   border-bottom: 34px solid #8a5f1a;
 }
 
-/* Kompisplaneten – räven och högarna */
+/* The Friend Planet – the fox and the piles */
 
 .fox-row {
   display: flex;
@@ -771,7 +803,7 @@ h1 {
   font-size: 1.1rem;
 }
 
-/* Kompisplaneten – tiokompisbron (tioram som bro) */
+/* The Friend Planet – the ten-friend bridge (a ten frame as a bridge) */
 
 .tenframe {
   display: grid;
@@ -799,7 +831,7 @@ h1 {
   background: rgba(200, 145, 47, 0.25);
 }
 
-/* Tvillingplaneten – spegeldammen */
+/* The Twin Planet – the mirror pond */
 
 .count-items.mirrored {
   flex-direction: column;
@@ -819,7 +851,7 @@ h1 {
   filter: blur(0.5px);
 }
 
-/* Vågplaneten – balansvågen */
+/* The Scale Planet – the balance scale */
 
 .balance {
   display: flex;
@@ -892,7 +924,7 @@ h1 {
   border-bottom: 34px solid #556;
 }
 
-/* Mönsterbältet – galoppbanan */
+/* The Pattern Belt – the gallop track */
 
 .pattern-row {
   display: flex;
@@ -951,7 +983,7 @@ h1 {
   letter-spacing: 0.1rem;
 }
 
-/* Festplaneten – lyktorna tänds en efter en */
+/* The Party Planet – the lanterns light up one after another */
 
 .lantern {
   font-size: 1.1rem;
@@ -969,7 +1001,7 @@ h1 {
   transform: scale(1.25);
 }
 
-/* Mata djuret */
+/* Feeding the animal */
 
 .feed-animal {
   display: flex;
@@ -1033,7 +1065,7 @@ h1 {
   transform: scale(1.04);
 }
 
-/* Ugglis feedback */
+/* Feedback from Ugglis */
 
 .ugglis-feedback {
   position: fixed;
@@ -1060,7 +1092,7 @@ h1 {
   to { transform: translateX(-50%) scale(1); opacity: 1; }
 }
 
-/* ---- Resultat & rymdstation ---- */
+/* ---- Result & space station ---- */
 
 .result,
 .station {
@@ -1119,10 +1151,10 @@ h1 {
   font-size: 3rem;
 }
 
-/* ---- PixiJS-lagren (WebGPU med WebGL-fallback) ---- */
+/* ---- The PixiJS layers (WebGPU with a WebGL fallback) ---- */
 
-/* Effektlagret: stjärnfält + guldregn BAKOM spelet. Ren dekoration –
-   pointer-events: none så inget tryck någonsin fastnar här. */
+/* The effect layer: starfield + golden rain BEHIND the game. Pure decoration –
+   pointer-events: none so no tap ever gets stuck here. */
 .space-backdrop {
   position: fixed;
   inset: 0;
@@ -1136,19 +1168,19 @@ h1 {
   height: 100%;
 }
 
-/* När canvas-stjärnorna är igång släcker vi CSS-prickarna (annars dubbelt) */
+/* When the canvas stars are running we turn off the CSS dots (otherwise double) */
 body.gpu-stars {
   background: linear-gradient(180deg, var(--space-dark), var(--space-darker));
   background-attachment: fixed;
 }
 
-/* Spelet ligger ovanpå effektlagret */
+/* The game sits on top of the effect layer */
 .app {
   position: relative;
   z-index: 1;
 }
 
-/* Apornas planet: Pixi-banan (samma ram som gamla .jump-scene) */
+/* The Monkey Planet: the Pixi scene (same frame as the old .jump-scene) */
 .jump-canvas {
   position: relative;
   height: 320px;
@@ -1162,7 +1194,7 @@ body.gpu-stars {
   display: block;
 }
 
-/* Raketresan: kort mellanskärm medan stjärnorna strimmar förbi */
+/* The rocket ride: a short interstitial while the stars streak past */
 .travel {
   display: flex;
   flex-direction: column;
@@ -1175,7 +1207,7 @@ body.gpu-stars {
 
 .travel-rocket {
   font-size: 5.5rem;
-  /* Raketen pekar uppåt och skakar av farten */
+  /* The rocket points upwards and shakes from the speed */
   transform: rotate(-45deg);
   animation: rumble 0.18s infinite;
   filter: drop-shadow(0 14px 18px rgba(255, 120, 40, 0.45));

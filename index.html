@@ -3,14 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <!-- Helskärm som "app" när spelet läggs till på mobilens hemskärm -->
+    <!-- Fullscreen, like an "app", when the game is added to the phone's home screen -->
     <meta name="theme-color" content="#1a1040" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Rymddjuren" />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="apple-touch-icon" href="ikon-180.png" />
+    <link rel="apple-touch-icon" href="icon-180.png" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦉</text></svg>" />
     <title>Rymddjuren – mattespelet</title>
   </head>
@@ -18,8 +18,8 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
-      // Offline-stöd: registrera service workern.
-      // (Inte vid file:// – dvs. när spela.html öppnas direkt som fil.)
+      // Offline support: register the service worker.
+      // (Not on file:// – i.e. when play.html is opened directly as a file.)
       if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
         window.addEventListener('load', function () {
           navigator.serviceWorker.register('sw.js').catch(function () {})

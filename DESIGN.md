@@ -1,67 +1,67 @@
 # Design: Rymddjuren 🚀🐾
 
-*(Uppdaterad efter intervju med spelaren själv!)*
+*(Updated after an interview with the player themselves!)*
 
-## Vad spelaren önskade sig
+## What the player asked for
 
-- **Rymden!** – djur som bor på olika planeter
-- Maskot: en busig liten uggla som heter **Ugglis** 🦉
-- Roligast: **mata djuren** och **samla saker**
-- Färger: **rött och gult**
+- **Space!** – animals that live on different planets
+- Mascot: a cheeky little owl called **Ugglis** 🦉
+- Most fun: **feeding the animals** and **collecting things**
+- Colours: **red and yellow**
 
-## Koncept
+## Concept
 
-Spelaren flyger i en raket mellan planeter. På varje planet bor rymddjur
-som behöver hjälp – oftast med mat! Uppgifterna löses med matte.
-För varje avklarad planet följer ett djur med i raketen och flyttar in i
-spelarens **rymdstation**, som växer och blir mer levande.
+The player flies a rocket between planets. On every planet there are space animals
+who need help – usually with food! The tasks are solved with maths.
+For every planet completed, an animal comes along in the rocket and moves into the
+player's **space station**, which grows and becomes more lively.
 
-## Maskot
+## Mascot
 
-**Ugglis** 🦉 – en busig liten rymduggla med hjälm som:
-- ger instruktionerna (kort text + 🔊-uppläsning)
-- hejar på och tröstar ("Bra jobbat!", "Nästan! Prova igen!")
-- busar och firar när det går bra
+**Ugglis** 🦉 – a cheeky little space owl in a helmet who:
+- gives the instructions (short text + 🔊 read-aloud)
+- cheers you on and comforts you ("Bra jobbat!", "Nästan! Prova igen!")
+- larks about and celebrates when things are going well
 
-## Spelloop
+## Game loop
 
-1. Stjärnkartan visar planeterna. Spelaren väljer nästa upplåsta planet.
-2. En planet = ca 10 korta uppgifter, en i taget, stora knappar.
-3. Många uppgifter handlar om att **mata djuren** (dra/välj rätt antal).
-4. Fel svar → andra chans med mild hjälp (t.ex. visa prickar att räkna).
-5. Avklarad planet → 1–3 stjärnor ⭐ + **djuret följer med till rymdstationen**.
-6. Rymdstationen är samlingssidan – alla djur syns och animeras där.
+1. The star map shows the planets. The player picks the next unlocked planet.
+2. One planet = about 10 short tasks, one at a time, large buttons.
+3. Many tasks are about **feeding the animals** (drag/pick the right number).
+4. Wrong answer → a second chance with gentle help (e.g. showing dots to count).
+5. Planet completed → 1–3 stars ⭐ + **the animal comes along to the space station**.
+6. The space station is the collection page – all the animals are shown and animated there.
 
-## Planeter → Lgr22 (åk 1)
+## Planets → Lgr22 (Year 1)
 
-| Planet | Rymddjur | Matte­moment |
+| Planet | Space animal | Maths topic |
 |---|---|---|
-| 1. Kaninplaneten | 🐰 Månkanin | Koppla antal till siffra, 1–10 |
-| 2. Stjärnstigen | 🐢 Rymdsköldpadda | Talraden 0–20, vilket tal fattas, grannar |
-| 3. Apornas planet | 🐵 Rymdapa | Addition 0–10 – mata aporna med rymdbananer |
-| 4. Kometkalaset | 🦜 Stjärnpapegoja | Subtraktion 0–10 – vem åt upp godiset? |
-| 5. Tvillingplaneten | 🐼 Rymdpanda | Dubbelt och hälften – dela maten lika |
-| 6. Kompisplaneten | 🦊 Stjärnräv | Talkamrater, t.ex. 7 = 3 + 4 |
-| 7. Vågplaneten | 🦎 Rymdödla | Likhetstecknet, vilken term fattas |
-| 8. Mönsterbältet | 🐴 Stjärnhäst | Mönster och talföljder |
-| 9. Jätteplaneten | 🦁 Rymdlejon | Addition/subtraktion 0–20 |
-| 10. Festplaneten | 🐘 Månelefant | Blandad utmaning – hela rymden firar! |
+| 1. the Rabbit Planet (Kaninplaneten) | 🐰 Moon Rabbit (Månkanin) | Linking quantity to numeral, 1–10 |
+| 2. the Star Path (Stjärnstigen) | 🐢 Space Turtle (Rymdsköldpadda) | The number line 0–20, which number is missing, neighbours |
+| 3. the Monkey Planet (Apornas planet) | 🐵 Space Monkey (Rymdapa) | Addition 0–10 – feed the monkeys with space bananas |
+| 4. the Comet Party (Kometkalaset) | 🦜 Star Parrot (Stjärnpapegoja) | Subtraction 0–10 – who ate up the sweets? |
+| 5. the Twin Planet (Tvillingplaneten) | 🐼 Space Panda (Rymdpanda) | Doubles and halves – share the food equally |
+| 6. the Friend Planet (Kompisplaneten) | 🦊 Star Fox (Stjärnräv) | Number bonds, e.g. 7 = 3 + 4 |
+| 7. the Scale Planet (Vågplaneten) | 🦎 Space Lizard (Rymdödla) | The equals sign, which term is missing |
+| 8. the Pattern Belt (Mönsterbältet) | 🐴 Star Horse (Stjärnhäst) | Patterns and number sequences |
+| 9. the Giant Planet (Jätteplaneten) | 🦁 Space Lion (Rymdlejon) | Addition/subtraction 0–20 |
+| 10. the Party Planet (Festplaneten) | 🐘 Moon Elephant (Månelefant) | Mixed challenge – the whole of space celebrates! |
 
-## Färger & utseende
+## Colours & appearance
 
-- Mörk rymdbakgrund med **röd raket** och **gula stjärnor** (spelarens önskan!)
-- Varma röda/gula knappar och belöningar, planeterna i olika färger
-- Stora tryckytor, mer bild än text
+- Dark space background with a **red rocket** and **yellow stars** (the player's wish!)
+- Warm red/yellow buttons and rewards, the planets in different colours
+- Large touch targets, more picture than text
 
-## Språk & ton
+## Language & tone
 
-- Väldigt korta, enkla meningar: "Hur många?", "Mata apan!"
-- Uppgifterna visas alltid visuellt (djur/frukt att räkna), inte bara siffror
-- Talsyntes (svenska) läser upp allt via 🔊-knapp
+- Very short, simple sentences: "Hur många?", "Mata apan!"
+- The tasks are always shown visually (animals/fruit to count), not just numerals
+- Speech synthesis (Swedish) reads everything aloud via the 🔊 button
 
-## Belöningsdetaljer
+## Reward details
 
-- Stjärnor per planet: klarad = ⭐, få fel = ⭐⭐, nästan alla rätt = ⭐⭐⭐
-- Planeter kan spelas om för fler stjärnor
-- Djursamlingen i rymdstationen är den stora belöningen
-- Framsteg sparas lokalt i webbläsaren (localStorage)
+- Stars per planet: completed = ⭐, few mistakes = ⭐⭐, almost all correct = ⭐⭐⭐
+- Planets can be replayed for more stars
+- The animal collection in the space station is the big reward
+- Progress is saved locally in the browser (localStorage)

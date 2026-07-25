@@ -1,17 +1,17 @@
-// Gemensamma typer för Rymddjuren
+// Shared types for Rymddjuren
 
 export interface ChoiceQuestion {
   type: 'choice'
   prompt: string
   spoken: string
-  /** Emoji att räkna (för "Hur många?") */
+  /** Emoji to count (for "how many?") */
   item?: string
   count?: number
-  /** Tallinje där null = det tal som fattas */
+  /** Number line where null = the number that is missing */
   numberline?: (number | null)[]
-  /** Spegeldammen (planet 5): visa raden en gång till som spegelbild */
+  /** The mirror pond (planet 5): show the row once more as a reflection */
   mirror?: boolean
-  /** Tiokompisbron (planet 6): så många av broens 10 plankor är på plats */
+  /** The ten-friend bridge (planet 6): this many of the bridge's 10 planks are in place */
   tenframe?: number
   choices: number[]
   answer: number
@@ -23,9 +23,9 @@ export interface FeedQuestion {
   spoken: string
   animal: string
   item: string
-  /** Så många ska matas */
+  /** This many should be fed */
   target: number
-  /** Så många visas att välja bland */
+  /** This many are shown to choose from */
   total: number
 }
 
@@ -44,17 +44,17 @@ export interface JumpQuestion {
   type: 'jump'
   prompt: string
   spoken: string
-  /** Apans startposition på marken (0–10) */
+  /** Where the rabbit starts on the ground (0–10) */
   start: number
-  /** Bananens position – hit ska apan landa (0–10) */
+  /** Where the banana hangs – the rabbit should land here (0–10) */
   target: number
-  /** Scenens vänstra kant (heltal som ritas ut) */
+  /** Left edge of the scene (whole number that gets drawn) */
   lo: number
-  /** Scenens högra kant */
+  /** Right edge of the scene */
   hi: number
-  /** Hopplängder att välja bland (talet = hoppets kraft) */
+  /** Jump lengths to choose from (the number = the power of the jump) */
   choices: number[]
-  /** Rätt hopplängd = target - start */
+  /** The correct jump length = target - start */
   answer: number
 }
 
@@ -62,19 +62,19 @@ export interface StairQuestion {
   type: 'stair'
   prompt: string
   spoken: string
-  /** 'ner' = ta bort (bakåträkning), 'upp' = utfyllnad (räkna uppåt) */
-  dir: 'ner' | 'upp'
-  /** Kaninens startsteg i komettrappan */
+  /** 'down' = taking away (counting backwards), 'up' = filling the gap (counting up) */
+  dir: 'down' | 'up'
+  /** The rabbit's starting step in the comet stairs */
   start: number
-  /** Målsteget – godiset (ner) eller papegojan (upp) */
+  /** The goal step – the sweets (down) or the parrot (up) */
   target: number
-  /** Lägsta trappsteg som ritas (aldrig under 0 – trappan slutar där!) */
+  /** Lowest step that gets drawn (never below 0 – the stairs end there!) */
   lo: number
-  /** Högsta trappsteg som ritas */
+  /** Highest step that gets drawn */
   hi: number
-  /** Antal steg att välja bland (talet = så många steg kaninen hoppar) */
+  /** Step counts to choose from (the number = how many steps the rabbit hops) */
   choices: number[]
-  /** Rätt antal steg = |target - start| */
+  /** The correct number of steps = |target - start| */
   answer: number
 }
 
@@ -82,95 +82,95 @@ export interface EatQuestion {
   type: 'eat'
   prompt: string
   spoken: string
-  /** Godis-emoji på kalasbordet */
+  /** Sweet emoji on the party table */
   item: string
-  /** Så många godisar fanns från början */
+  /** This many sweets were there to begin with */
   total: number
-  /** Så många äter papegojan upp (synligt!) */
+  /** This many the parrot eats (visibly!) */
   eaten: number
   choices: number[]
-  /** Kvar = total - eaten */
+  /** Left over = total - eaten */
   answer: number
 }
 
-/** Tvillingplaneten: dela lika mellan pandorna – gungbrädan tippar synligt */
+/** The Twin Planet: share equally between the pandas – the seesaw visibly tips */
 export interface ShareQuestion {
   type: 'share'
   prompt: string
   spoken: string
   item: string
-  /** Så många ska delas – alltid jämnt */
+  /** This many are to be shared – always an even number */
   total: number
 }
 
-/** Tvillingplaneten: studsmattan dubblar hoppet – valt tal × 2 = landning */
+/** The Twin Planet: the trampoline doubles the jump – chosen number × 2 = landing */
 export interface DoubleQuestion {
   type: 'double'
   prompt: string
   spoken: string
-  /** Stjärnans plats – alltid jämn (= dubbelt av svaret) */
+  /** Where the star sits – always even (= double the answer) */
   target: number
-  /** Banans högsta tal som ritas */
+  /** The highest number drawn on the track */
   hi: number
   choices: number[]
-  /** Rätt hoppkraft = target / 2 */
+  /** The correct jump power = target / 2 */
   answer: number
 }
 
-/** Kompisplaneten: välj TVÅ högar som tillsammans blir rävens tal */
+/** The Friend Planet: pick TWO piles that together make the fox's number */
 export interface PairQuestion {
   type: 'pair'
   prompt: string
   spoken: string
   item: string
-  /** Talet räven önskar sig */
+  /** The number the fox wishes for */
   want: number
-  /** Högarnas storlekar – minst ett par summerar till want */
+  /** The sizes of the piles – at least one pair adds up to want */
   piles: number[]
 }
 
-/** Vågplaneten: gör lika på båda sidor – vågen tippar mot den tyngre */
+/** The Scale Planet: make both sides equal – the scale tips towards the heavier side */
 export interface BalanceQuestion {
   type: 'balance'
   prompt: string
   spoken: string
-  /** Kända korgar på vänster sida */
+  /** Known baskets on the left side */
   left: number[]
-  /** Kända korgar på höger sida (plus det tomma facket) */
+  /** Known baskets on the right side (plus the empty slot) */
   right: number[]
   choices: number[]
-  /** Rätt sten = summa vänster − summa höger */
+  /** The correct stone = sum of left − sum of right */
   answer: number
 }
 
-/** Mönsterbältet: fortsätt mönstret / hitta biten som upprepas */
+/** The Pattern Belt: continue the pattern / find the repeating unit */
 export interface PatternQuestion {
   type: 'pattern'
   prompt: string
   spoken: string
-  /** 'next' = vad kommer sen?  'unit' = vilken bit upprepas? */
+  /** 'next' = what comes next?  'unit' = which piece repeats? */
   mode: 'next' | 'unit'
-  /** Mönstret som visas (utan det som fattas) */
+  /** The pattern that is shown (without the missing part) */
   sequence: string[]
-  /** Emoji (next) eller emoji-bitar (unit) att välja bland */
+  /** Emoji (next) or emoji pieces (unit) to choose from */
   choices: string[]
   answer: string
 }
 
-/** Jätteplaneten: stora hopp i TVÅ steg – via vilostationen på 10 */
+/** The Giant Planet: big jumps in TWO steps – via the rest stop at 10 */
 export interface Via10Question {
   type: 'via10'
   prompt: string
   spoken: string
   start: number
   target: number
-  /** Lägsta/högsta tal som ritas (10 ingår alltid) */
+  /** Lowest/highest number drawn (10 is always included) */
   lo: number
   hi: number
-  /** Steg 1: hoppet till tian */
+  /** Step 1: the jump to ten */
   choices1: number[]
   answer1: number
-  /** Steg 2: resten till stjärnan */
+  /** Step 2: the rest of the way to the star */
   choices2: number[]
   answer2: number
 }
@@ -196,7 +196,7 @@ export interface Level {
   animalName: string
   color: string
   desc: string
-  /** null = banan är inte byggd än */
+  /** null = the level has not been built yet */
   generate: (() => Question[]) | null
 }
 

@@ -1,7 +1,7 @@
-// Liten brygga så att spelet kan be effektlagret om en stjärnexplosion
-// (t.ex. vid varje rätt svar) utan att känna till Pixi eller SpaceBackdrop.
-// SpaceBackdrop registrerar sig när den startar; finns inget effektlager
-// (gammal webbläsare, reduced motion) händer helt enkelt ingenting.
+// A small bridge so the game can ask the effect layer for a star burst
+// (e.g. on every correct answer) without knowing about Pixi or SpaceBackdrop.
+// SpaceBackdrop registers itself when it starts; if there is no effect layer
+// (old browser, reduced motion) nothing at all happens.
 
 type BurstFn = () => void
 
@@ -11,7 +11,7 @@ export function registerBurst(fn: BurstFn | null) {
   handler = fn
 }
 
-/** Fyrverkeri! Anropas t.ex. när barnet svarar rätt. */
+/** Fireworks! Called e.g. when the child answers correctly. */
 export function cheerBurst() {
   handler?.()
 }

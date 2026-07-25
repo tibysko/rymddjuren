@@ -1,5 +1,6 @@
 import { LEVELS } from '../game/levels'
 import type { Progress } from '../game/types'
+import { sv } from '../i18n/sv'
 
 interface Props {
   progress: Progress
@@ -11,11 +12,10 @@ export default function Station({ progress, onBack }: Props) {
 
   return (
     <div className="station">
-      <h1>🛰️ Min rymdstation</h1>
+      <h1>{sv.station.title}</h1>
       {collected.length === 0 ? (
         <p className="station-empty">
-          <span className="ugglis">🦉</span> Här är det tomt än! Klara en planet
-          så flyttar ett djur in.
+          <span className="ugglis">🦉</span> {sv.station.empty}
         </p>
       ) : (
         <div className="station-animals">
@@ -28,7 +28,7 @@ export default function Station({ progress, onBack }: Props) {
         </div>
       )}
       <button className="big-btn" onClick={onBack}>
-        ⬅️ Tillbaka
+        {sv.station.back}
       </button>
     </div>
   )

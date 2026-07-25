@@ -1,5 +1,5 @@
-// Enkla toner med webbläsarens inbyggda WebAudio – inga beroenden.
-// Ljudet är grädde, inte kaka: allt ska funka precis lika bra utan.
+// Simple tones using the browser's built-in WebAudio – no dependencies.
+// Sound is icing, not cake: everything must work just as well without it.
 
 let ctx: AudioContext | null = null
 
@@ -17,16 +17,16 @@ export function playTone(freq: number, ms = 200): void {
     osc.start()
     osc.stop(ctx.currentTime + ms / 1000)
   } catch {
-    // ingen AudioContext (eller blockerad) – tyst är också okej
+    // no AudioContext (or it is blocked) – silence is fine too
   }
 }
 
-/** Varje mönsterfärg har en egen ton – så mönstret HÖRS som en melodi */
+/** Every pattern colour has its own tone – so the pattern is HEARD as a melody */
 const PATTERN_TONES: Record<string, number> = {
   '🔴': 262, // C
   '🟡': 330, // E
   '🔵': 392, // G
-  '🟢': 523, // hög C
+  '🟢': 523, // high C
 }
 
 export function playPatternTone(emoji: string): void {

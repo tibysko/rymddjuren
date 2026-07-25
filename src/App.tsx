@@ -5,6 +5,7 @@ import LevelScreen from './components/LevelScreen'
 import ResultScreen from './components/ResultScreen'
 import Station from './components/Station'
 import type { Level, Progress } from './game/types'
+import { sv } from './i18n/sv'
 
 const STORAGE_KEY = 'rymddjuren-progress'
 
@@ -21,7 +22,7 @@ function loadProgress(): Progress {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) return JSON.parse(raw) as Progress
   } catch {
-    // trasig data – börja om
+    // broken data – start over
   }
   return { stars: {}, animals: [] }
 }
@@ -37,16 +38,16 @@ export default function App() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
     } catch {
-      // t.ex. privat läge – spelet funkar ändå, men sparar inte
+      // e.g. private mode – the game still works, it just does not save
     }
   }
 
   function handlePlay(level: Level) {
     setCurrentLevel(level)
-    setScreen('travel') // först en snabb raketresa genom hyperrymden!
+    setScreen('travel') // first a quick rocket ride through hyperspace!
   }
 
-  // Resan är kort och kräver ingenting av spelaren – banan startar av sig själv
+  // The trip is short and asks nothing of the player – the level starts on its own
   useEffect(() => {
     if (screen !== 'travel') return
     const id = setTimeout(() => setScreen('level'), 1700)
@@ -68,7 +69,7 @@ export default function App() {
 
   return (
     <>
-      {/* Stjärnfältet bakom allt – hyperrymd på väg till planeten, guldregn när den är klarad! */}
+      {/* The starfield behind everything – hyperspace on the way to the planet, golden rain once it is cleared! */}
       <SpaceBackdrop mode={screen === 'result' ? 'cheer' : screen === 'travel' ? 'travel' : 'calm'} />
       <div className="app">
       {screen === 'map' && (
@@ -78,7 +79,8 @@ export default function App() {
         <div className="travel">
           <span className="travel-rocket">🚀</span>
           <p className="travel-text">
-            Mot {currentLevel.name}! <span className="travel-animal">{currentLevel.animal}</span>
+            {sv.travel.heading(currentLevel.name)}{' '}
+            <span className="travel-animal">{currentLevel.animal}</span>
           </p>
         </div>
       )}
