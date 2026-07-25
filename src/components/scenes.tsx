@@ -52,23 +52,25 @@ function useTimers() {
 export function ShareScene({ q, locked, onRight, onWrong }: SceneProps<ShareQuestion>) {
   const [left, setLeft] = useState(0)
   const [right, setRight] = useState(0)
+  const [checking, setChecking] = useState(false)
   const remaining = q.total - left - right
   const tilt = Math.max(-14, Math.min(14, (right - left) * 4))
 
   function give(side: 'left' | 'right') {
-    if (locked || remaining === 0) return
+    if (locked || checking || remaining === 0) return
     if (side === 'left') setLeft((n) => n + 1)
     else setRight((n) => n + 1)
   }
 
   function takeBack(side: 'left' | 'right') {
-    if (locked) return
+    if (locked || checking) return
     if (side === 'left' && left > 0) setLeft((n) => n - 1)
     if (side === 'right' && right > 0) setRight((n) => n - 1)
   }
 
   function check() {
-    if (locked) return
+    if (locked || checking) return
+    setChecking(true)
     if (remaining > 0) {
       onWrong(sv.share.shareAllFirst)
     } else if (left !== right) {
@@ -76,11 +78,13 @@ export function ShareScene({ q, locked, onRight, onWrong }: SceneProps<ShareQues
     } else {
       onRight()
     }
+    if (remaining > 0 || left !== right) window.setTimeout(() => setChecking(false), 2200)
   }
 
   return (
     <>
       <div className="share-pile" data-total={q.total}>
+        <span className="share-source-label">{sv.share.source}</span>
         {remaining > 0 ? (
           Array.from({ length: remaining }).map((_, i) => (
             <span key={i} className="share-pile-item">{q.item}</span>
@@ -99,17 +103,18 @@ export function ShareScene({ q, locked, onRight, onWrong }: SceneProps<ShareQues
               className="seesaw-panda"
               data-side="left"
               onClick={() => give('left')}
-              disabled={locked || remaining === 0}
+              disabled={locked || checking || remaining === 0}
               aria-label={sv.share.giveLeftLabel}
             >
               <span aria-hidden="true">🐼</span>
               <span className="seesaw-give-label">{sv.share.giveLabel}</span>
             </button>
-            <button className="seesaw-items" onClick={() => takeBack('left')} aria-label={sv.share.takeBackLeftLabel}>
+            <button className="seesaw-items" onClick={() => takeBack('left')} disabled={locked || checking || left === 0} aria-label={sv.share.takeBackLeftLabel}>
               {Array.from({ length: left }).map((_, i) => (
                 <span key={i}>{q.item}</span>
               ))}
               <b className="seesaw-count">{left}</b>
+              {left > 0 && <span className="seesaw-undo-label">{sv.share.undoLabel}</span>}
             </button>
           </div>
           <div className="seesaw-end">
@@ -117,23 +122,24 @@ export function ShareScene({ q, locked, onRight, onWrong }: SceneProps<ShareQues
               className="seesaw-panda"
               data-side="right"
               onClick={() => give('right')}
-              disabled={locked || remaining === 0}
+              disabled={locked || checking || remaining === 0}
               aria-label={sv.share.giveRightLabel}
             >
               <span aria-hidden="true">🐼</span>
               <span className="seesaw-give-label">{sv.share.giveLabel}</span>
             </button>
-            <button className="seesaw-items" onClick={() => takeBack('right')} aria-label={sv.share.takeBackRightLabel}>
+            <button className="seesaw-items" onClick={() => takeBack('right')} disabled={locked || checking || right === 0} aria-label={sv.share.takeBackRightLabel}>
               {Array.from({ length: right }).map((_, i) => (
                 <span key={i}>{q.item}</span>
               ))}
               <b className="seesaw-count">{right}</b>
+              {right > 0 && <span className="seesaw-undo-label">{sv.share.undoLabel}</span>}
             </button>
           </div>
         </div>
         <div className="seesaw-base" />
       </div>
-      <button className="big-btn check-btn" onClick={check}>
+      <button className="big-btn check-btn" onClick={check} disabled={locked || checking}>
         {sv.level.check}
       </button>
     </>

@@ -77,6 +77,11 @@ export default function Station({ progress, onBack }: Props) {
 
   return (
     <div className="station">
+      <div className="station-topbar">
+        <button className="quit-btn station-back" onClick={onBack}>
+          {sv.station.back}
+        </button>
+      </div>
       <div className="station-heading">
         <h1>{sv.station.title}</h1>
         <button
@@ -178,9 +183,6 @@ export default function Station({ progress, onBack }: Props) {
         })}
       </div>
 
-      <button className="big-btn" onClick={onBack}>
-        {sv.station.back}
-      </button>
     </div>
   )
 }

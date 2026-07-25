@@ -36,6 +36,12 @@ button {
   -webkit-tap-highlight-color: transparent;
 }
 
+button:disabled {
+  cursor: default;
+  filter: saturate(0.45);
+  opacity: 0.58;
+}
+
 .app {
   max-width: 720px;
   margin: 0 auto;
@@ -190,10 +196,12 @@ h1 {
 }
 
 .quit-btn {
-  background: rgba(255, 255, 255, 0.12);
-  border: none;
+  background: var(--accent-yellow);
+  color: #312300;
+  border: 3px solid #fff3b0;
   border-radius: 12px;
-  font-size: 1.4rem;
+  font-size: 0.9rem;
+  font-weight: 800;
   padding: 0.4rem 0.7rem;
   /* At least a 48×48 px touch target for small thumbs */
   min-width: 48px;
@@ -243,6 +251,7 @@ h1 {
 .speak-btn {
   background: var(--accent-yellow);
   border: none;
+  box-shadow: 0 0.25rem 0.7rem rgba(0, 0, 0, 0.32);
   border-radius: 50%;
   width: 3rem;
   height: 3rem;
@@ -607,6 +616,26 @@ h1 {
 }
 
 /* The Twin Planet – the seesaw */
+.eat-story {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.eat-story span {
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.eat-story .eat-left {
+  background: rgba(255, 211, 42, 0.25);
+  color: var(--accent-yellow);
+}
+
 
 .share-pile {
   display: flex;
@@ -665,6 +694,14 @@ h1 {
 .seesaw-panda {
   display: flex;
   flex-direction: column;
+.share-source-label {
+  width: 100%;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--accent-yellow);
+}
+
   align-items: center;
   justify-content: center;
   gap: 0.1rem;
@@ -760,6 +797,12 @@ h1 {
 }
 
 .fox-dots i,
+.seesaw-undo-label {
+  width: 100%;
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
 .basket-dots i {
   width: 0.6rem;
   height: 0.6rem;
@@ -1153,6 +1196,30 @@ h1 {
 .station-core {
   font-size: 3.2rem;
 }
+.station-topbar {
+  align-self: stretch;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.station-back {
+  background: var(--accent-yellow);
+  color: #312300;
+}
+
+.result-panel {
+  position: relative;
+  z-index: 1;
+  width: min(34rem, 100%);
+  min-height: calc(100vh - 4rem);
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  border: 2px solid rgba(255, 211, 42, 0.7);
+  border-radius: 28px;
+  background: rgba(18, 11, 46, 0.93);
+  box-shadow: 0 0 2rem rgba(0, 0, 0, 0.55);
+}
+
 
 .station-modules {
   display: flex;
@@ -1369,6 +1436,10 @@ body.gpu-stars {
 
 .jump-canvas canvas {
   display: block;
+
+  .result-animal-emoji {
+    animation: none;
+  }
 }
 
 /* The rocket ride: a short interstitial while the stars streak past */
