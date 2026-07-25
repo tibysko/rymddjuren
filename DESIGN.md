@@ -55,6 +55,7 @@ player's **space station**, which grows and becomes more lively.
 - Warm red/yellow buttons and rewards, the planets in different colours
 - Large touch targets, more picture than text
 - Every planet fits the phone screen without horizontal scrolling
+- A small version control lets the owner check the exact deployed build on a phone
 
 ## Language & tone
 
@@ -63,6 +64,13 @@ player's **space station**, which grows and becomes more lively.
 - Speech synthesis (Swedish) reads everything aloud via the 🔊 button
 - Fixed Swedish lines can be exported with the OpenAI Speech API for future
   prerecorded audio; the generated files are not integrated into the game yet
+
+## Automated verification
+
+- Browser flow tests may accelerate time and remove decorative motion, but this
+  never changes the production game's calm, child-friendly pace.
+- Screenshot tests and focused real-time checks keep their normal browser clock
+  so visual appearance and intentional animation still have regression coverage.
 
 ## Reward details
 

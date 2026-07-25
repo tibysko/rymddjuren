@@ -20,7 +20,10 @@ const SHOT = { fullPage: true, maxDiffPixels: 400 }
 /** Open the game the way every picture here needs it: still, and reproducible */
 async function open(game: Game, progress: Progress, seed?: number) {
   await game.page.emulateMedia({ reducedMotion: 'reduce' })
-  await game.start(progress, seed)
+  // Screenshot comparison needs the browser's real animation-frame clock to
+  // decide when two consecutive frames are stable. Reduced motion still keeps
+  // the decorative Pixi backdrop out of these tests.
+  await game.start(progress, seed, { realTime: true })
 }
 
 /** Hide what is left of the canvas layers and paint the page so nothing ends in white */
@@ -38,6 +41,14 @@ test('stjärnkartan', async ({ game }) => {
   await open(game, HALF)
   await calm(game.page)
   await expect(game.page).toHaveScreenshot('stjarnkarta.png', SHOT)
+})
+
+test('versionsstämpeln visar vilken build som körs', async ({ game }) => {
+  await game.start(HALF)
+  const button = game.page.getByRole('button', { name: 'Version' })
+  await expect(button).toBeVisible()
+  await button.click()
+  await expect(game.page.getByRole('dialog')).toContainText('Version')
 })
 
 test('stationen är tom', async ({ game }) => {

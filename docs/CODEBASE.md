@@ -200,7 +200,19 @@ parameters as errors. The smallest technical check after a change is therefore
 `npm run build`. For the single-file and offline delivery, `npm run build:single`
 should be run as well.
 
-Playwright is present as a development dependency, but the project currently has
-no checked-in test files or `test` script. Game flows, animations, speech
-synthesis, sound, touch targets, production unlocking and the fallback between
-renderers therefore still need to be checked manually.
+Playwright tests are checked in under `tests/` and run with `npm test`. The suite
+builds and serves the production app, plays every planet to completion, checks
+space-station rules, watches browser errors and compares screenshots for the map,
+station and first question on every planet. The shared fixture seeds progress and
+`Math.random` so each run gets the same questions.
+
+Flow tests run with reduced motion, disabled CSS transitions and a 20x browser
+clock. This preserves state changes and mathematical outcomes without waiting for
+pauses deliberately tuned for a child. Screenshot tests use reduced motion but a
+real animation-frame clock, and the station bounce has a focused real-time test.
+The accelerated clock exists only in the Playwright page and cannot affect the
+production build. The full suite normally takes about one to two minutes locally.
+
+Browser automation does not replace manual play-throughs on a real touch device.
+Speech quality, touch comfort, animation feel and renderer fallback should still
+be checked manually when related code changes.

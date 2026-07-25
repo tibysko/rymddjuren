@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { LEVELS } from '../game/levels'
 import type { Level, Progress } from '../game/types'
 import { sv } from '../i18n/sv'
@@ -13,9 +13,11 @@ interface Props {
 // In dev mode (npm run dev) every level is unlocked so it can be tested right away.
 // The built single-file page is a production build → normal unlocking applies there.
 const DEV = import.meta.env.DEV
+const BUILD_ID = import.meta.env.VITE_BUILD_ID?.slice(0, 7) || sv.map.buildLocal
 
 export default function StarMap({ progress, onPlay, onStation }: Props) {
   const stars = progress.stars || {}
+  const [buildInfoOpen, setBuildInfoOpen] = useState(false)
 
   function isUnlocked(level: Level): boolean {
     if (DEV) return true
@@ -68,6 +70,21 @@ export default function StarMap({ progress, onPlay, onStation }: Props) {
             </button>
           )
         })}
+      </div>
+
+      <div className="build-info">
+        <button className="build-info-button" type="button" onClick={() => setBuildInfoOpen(true)}>
+          {sv.map.buildButton}
+        </button>
+        {buildInfoOpen && (
+          <section className="build-info-panel" role="dialog" aria-modal="true" aria-labelledby="build-info-heading">
+            <h2 id="build-info-heading">{sv.map.buildHeading}</h2>
+            <p>{sv.map.buildVersion(BUILD_ID)}</p>
+            <button type="button" onClick={() => setBuildInfoOpen(false)}>
+              {sv.map.buildClose}
+            </button>
+          </section>
+        )}
       </div>
     </div>
   )

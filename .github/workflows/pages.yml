@@ -37,6 +37,8 @@ jobs:
 
       - name: Build the single-file version (play.html)
         run: npm run build:single
+        env:
+          VITE_BUILD_ID: ${{ github.sha }}
 
       - name: Assemble the site
         run: |

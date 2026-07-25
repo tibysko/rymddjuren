@@ -44,6 +44,9 @@ and publishes `play.html` as the start page on GitHub Pages.
   and it works like an app
 - `npm run build:single` also creates `play.html` locally – the whole game in one
   file that works without a server
+- Tap `Version` on the star map to see the seven-character Git commit embedded by
+  GitHub Pages; compare it with the latest commit on `main` to confirm the phone
+  has the newest deployment
 
 ## What should the game practise? (Lgr22, Year 1)
 
@@ -88,7 +91,7 @@ content for Years 1–3) and the Year 1 assessment support material for number s
 
 ```bash
 npx playwright install chromium   # once
-npm test                          # everything, about five minutes
+npm test                          # everything, usually about one to two minutes
 npm run test:ui                   # watch the bot play, step by step
 npm run test:report               # the report from the last run
 npm run test:update               # accept new screenshots after a deliberate change
@@ -98,11 +101,14 @@ npm run test:update               # accept new screenshots after a deliberate ch
   It only knows what the screen shows: the prompt says how many carrots to feed,
   the fox says which sum it wants, the seesaw has to be shared evenly, and
   everything else it works out by elimination (every question offers three
-  choices, so at most three tries).
+  choices, so at most three tries). Flow tests accelerate the browser clock and
+  turn off decorative motion; the production game keeps its child-friendly pace.
 - `tests/planets.spec.ts` – one test per planet, played all the way through.
-- `tests/station.spec.ts` – the rules of the space station.
+- `tests/station.spec.ts` – the rules of the space station, including one
+  real-time animation check.
 - `tests/visual.spec.ts` – screenshots, taken with reduced motion asked for so
-  the starfield does not move (and does not draw random numbers) between runs.
+  the starfield does not move (and does not draw random numbers) between runs;
+  these use the real animation-frame clock so screenshot settling stays reliable.
   The pictures live in `tests/visual.spec.ts-snapshots/` and belong in git; they
   are machine-specific (`…-chromium-darwin.png`).
 

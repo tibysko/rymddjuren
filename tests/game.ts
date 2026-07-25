@@ -28,11 +28,18 @@ export interface Progress {
   stars: Record<number, number>
 }
 
+interface StartOptions {
+  /** Run at the child's real pace instead of the accelerated test pace. */
+  realTime?: boolean
+  /** Keep decorative and CSS motion enabled. */
+  motion?: boolean
+}
+
 /** Everything a test needs to drive the game */
 export interface Game {
   page: Page
   /** Open the game with this save file (and this random seed) */
-  start: (progress: Progress, seed?: number) => Promise<void>
+  start: (progress: Progress, seed?: number, options?: StartOptions) => Promise<void>
   /** Open the space station from the star map */
   station: () => Promise<void>
   /** Fly to planet 1–10 and wait for the level to start */
@@ -55,10 +62,51 @@ export const test = base.extend<{ game: Game }>({
       page,
       errors,
 
-      async start(progress, seed = 1337) {
+      async start(progress, seed = 1337, options = {}) {
+        const speed = options.realTime ? 1 : 20
+        await page.emulateMedia({ reducedMotion: options.motion ? 'no-preference' : 'reduce' })
         await page.addInitScript(
-          ([key, saved, randomSeed]: [string, string, number]) => {
+          ([key, saved, randomSeed, clockSpeed]: [string, string, number, number]) => {
             localStorage.setItem(key, saved)
+
+            // Browser flows should verify behaviour, not spend minutes waiting
+            // for pauses deliberately tuned for a seven-year-old. Keep one
+            // real-time animation test, but accelerate timers and animation
+            // frames for the rest of the suite. This is isolated to the test
+            // page and cannot affect the production build.
+            if (clockSpeed > 1) {
+              const scaleDelay = (delay?: number) => Math.max(0, (delay ?? 0) / clockSpeed)
+              const nativeSetTimeout = window.setTimeout.bind(window)
+              const nativeSetInterval = window.setInterval.bind(window)
+              const nativeRequestAnimationFrame = window.requestAnimationFrame.bind(window)
+              const frameOrigin = performance.now()
+
+              const stopCssMotion = () => {
+                const style = document.createElement('style')
+                style.textContent = `
+                  *, *::before, *::after {
+                    animation-duration: 0s !important;
+                    animation-delay: 0s !important;
+                    transition-duration: 0s !important;
+                    transition-delay: 0s !important;
+                    scroll-behavior: auto !important;
+                  }
+                `
+                document.documentElement.appendChild(style)
+              }
+              if (document.documentElement) stopCssMotion()
+              else document.addEventListener('DOMContentLoaded', stopCssMotion, { once: true })
+
+              window.setTimeout = ((handler: TimerHandler, delay?: number, ...args: unknown[]) =>
+                nativeSetTimeout(handler, scaleDelay(delay), ...args)) as typeof window.setTimeout
+              window.setInterval = ((handler: TimerHandler, delay?: number, ...args: unknown[]) =>
+                nativeSetInterval(handler, scaleDelay(delay), ...args)) as typeof window.setInterval
+              window.requestAnimationFrame = ((callback: FrameRequestCallback) =>
+                nativeRequestAnimationFrame((timestamp) =>
+                  callback(frameOrigin + (timestamp - frameOrigin) * clockSpeed),
+                )) as typeof window.requestAnimationFrame
+            }
+
             // A small deterministic generator, so a rerun gives the same
             // questions – otherwise screenshots differ every single time.
             let state = randomSeed
@@ -97,7 +145,7 @@ export const test = base.extend<{ game: Game }>({
             if (document.documentElement) watch()
             else document.addEventListener('DOMContentLoaded', watch)
           },
-          [STORAGE_KEY, JSON.stringify(progress), seed] as [string, string, number],
+          [STORAGE_KEY, JSON.stringify(progress), seed, speed] as [string, string, number, number],
         )
         await page.goto('/')
         await expect(page.locator('.starmap')).toBeVisible()

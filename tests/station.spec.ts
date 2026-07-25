@@ -28,7 +28,9 @@ test.describe('Rymdstationen', () => {
   })
 
   test('tryck på ett djur ger en glädjestuds som tar slut', async ({ game }) => {
-    await game.start(HALF)
+    // This is the one test that measures a real animation, so it deliberately
+    // opts out of the accelerated clock and reduced-motion test default.
+    await game.start(HALF, undefined, { realTime: true, motion: true })
     await game.station()
     const card = game.page.locator('.station-animal.home').first()
 
