@@ -88,6 +88,7 @@ content for Years 1–3) and the Year 1 assessment support material for number s
 - [x] The game tests itself (`npm test`, `tests/`): Playwright builds the production version, serves it and plays it in a phone-sized browser. A bot plays all ten planets from the first question to the results screen – it waits for each animation to finish, answers, and if Ugglis says "try again" it rules that answer out and picks another – while the tests watch for browser errors. On top of that come the rules of the space station and a screenshot of every screen. See [Tests](#tests).
 - [x] Safe progress recovery: malformed, incomplete or old local progress is repaired instead of blanking the game, and leaving a level cancels its pending callbacks.
 - [x] Read-aloud is available on the map, travel screen, result screen, space station and Ugglis feedback, as well as every level prompt.
+- [x] The game asks supported browsers to keep the screen awake while it is open, and restores the screen wake lock after returning to the game.
 
 ## Tests
 

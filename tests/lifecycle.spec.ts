@@ -17,3 +17,37 @@ test('leaving the last celebration never opens the result screen afterwards', as
   await game.page.waitForTimeout(1_400)
   await expect(game.page.locator('.result')).toHaveCount(0)
 })
+
+test('keeps the screen awake while the game is open', async ({ game }) => {
+  await game.page.addInitScript(() => {
+    const spy = { requests: 0 }
+    ;(window as Window & { __wakeLockSpy?: typeof spy }).__wakeLockSpy = spy
+
+    Object.defineProperty(navigator, 'wakeLock', {
+      configurable: true,
+      value: {
+        request: async () => {
+          spy.requests += 1
+          return {
+            released: false,
+            type: 'screen',
+            addEventListener: () => undefined,
+            removeEventListener: () => undefined,
+            dispatchEvent: () => true,
+            onrelease: null,
+            release: async () => undefined,
+          }
+        },
+      },
+    })
+  })
+
+  await game.start(FULL)
+  await expect
+    .poll(() =>
+      game.page.evaluate(
+        () => (window as Window & { __wakeLockSpy?: { requests: number } }).__wakeLockSpy?.requests,
+      ),
+    )
+    .toBeGreaterThan(0)
+})

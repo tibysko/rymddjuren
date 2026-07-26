@@ -56,6 +56,7 @@ player's **space station**, which grows and becomes more lively.
 - Large touch targets, more picture than text
 - Every planet fits the phone screen without horizontal scrolling
 - A small version control lets the owner check the exact deployed build on a phone
+- Supported browsers are asked to keep the screen awake while the game is open
 
 ## Language & tone
 

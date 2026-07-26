@@ -8,6 +8,7 @@ import { LEVELS } from './game/levels'
 import { normalizeProgress, parseProgress, PROGRESS_STORAGE_KEY } from './game/progress'
 import { speak } from './game/speech'
 import type { Level, Progress } from './game/types'
+import { keepScreenAwake } from './game/wakeLock'
 import { sv } from './i18n/sv'
 
 type Screen = 'map' | 'travel' | 'level' | 'result' | 'station'
@@ -48,6 +49,8 @@ export default function App() {
   // settles back into the calm starfield instead of running forever.
   const [stationParty, setStationParty] = useState(false)
   const stationFull = (progress.animals?.length || 0) >= LEVELS.length
+
+  useEffect(() => keepScreenAwake(), [])
 
   function saveProgress(next: Progress) {
     const safe = normalizeProgress(next, LEVELS.length)
